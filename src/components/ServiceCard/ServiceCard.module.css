@@ -1,0 +1,71 @@
+/* src/components/ServiceCard/ServiceCard.module.css */
+.card {
+  background-color: var(--color-white);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.imageContainer {
+  height: 200px;
+  width: 100%;
+}
+
+.imageContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-medium-grey);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.bookButtonLink {
+  text-decoration: none;
+  margin-top: auto; /* This was on the button, move it to the link */
+}
+
+.bookButton {
+  margin-top: auto; /* Pushes button to the bottom */
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: var(--color-charcoal);
+  color: var(--color-white);
+  transition: opacity 0.2s ease-in-out;
+}
+
+.bookButton:hover {
+  opacity: 0.8;
+}

@@ -1,0 +1,127 @@
+/* src/pages/BookingPage/BookingPage.module.css */
+.bookingPage {
+  padding: 2rem;
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.progressTracker {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.progressStep {
+  color: var(--color-medium-grey);
+  flex: 1;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-light-grey);
+}
+
+.progressStep.active {
+  color: var(--color-charcoal);
+  border-bottom: 2px solid var(--color-charcoal);
+  font-weight: bold;
+}
+
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepContainer h2 {
+  margin-bottom: 1.5rem;
+}
+
+/* Step 1 Styles */
+.timeSlots {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.timeSlot {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--color-medium-grey);
+  background: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.timeSlot.selected {
+  background-color: var(--color-charcoal);
+  color: var(--color-white);
+  border-color: var(--color-charcoal);
+}
+
+/* Step 2 Styles */
+.bookingSummary {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--color-light-grey);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.bookingSummary p {
+  margin-bottom: 0.5rem;
+}
+
+.detailsForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1rem;
+}
+
+.detailsForm input {
+  padding: 0.8rem;
+  border: 1px solid var(--color-light-grey);
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Step 3 Styles */
+.confirmation {
+  text-align: center;
+}
+
+.checkMark {
+  font-size: 4rem;
+  color: green;
+}
+
+/* Button Styles */
+.nextButton,
+.backButton {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+}
+
+.nextButton {
+  background-color: var(--color-charcoal);
+  color: var(--color-white);
+}
+
+.backButton {
+  background-color: var(--color-light-grey);
+  color: var(--color-charcoal);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1.5rem;
+}

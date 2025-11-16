@@ -1,0 +1,140 @@
+/* src/components/Header/Header.module.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  background-color: var(--color-white);
+}
+
+.logo {
+  text-decoration: none;
+  color: var(--color-charcoal);
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* --- MOBILE STYLES --- */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  z-index: 90; /* High, but lower than the nav */
+}
+
+.burger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 20; /* Sits on top of the header */
+}
+
+.burger div {
+  width: 2rem;
+  height: 0.25rem;
+  background: var(--color-charcoal);
+  border-radius: 10px;
+  transition: all 0.3s linear;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  background: var(--color-charcoal);
+  height: 100vh;
+  width: 70%;
+  max-width: 300px;
+  text-align: left;
+  padding: 2rem;
+  position: fixed;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 100; /* <<< THIS IS THE KEY FIX: HIGHEST z-index */
+}
+
+.mobileNav.open {
+  transform: translateX(0);
+}
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-size: 2.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mobileNav a {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.3s linear;
+}
+
+.mobileLink {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.3s linear;
+  cursor: pointer; /* Makes it feel like a link */
+  width: 100%; /* Makes the whole row clickable */
+}
+
+.desktopNav {
+  display: none;
+}
+
+/* --- DESKTOP STYLES --- */
+@media (min-width: 769px) {
+  .burger,
+  .mobileNav,
+  .closeButton,
+  .overlay {
+    display: none;
+  }
+
+  .desktopNav {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .desktopNav a {
+    text-decoration: none;
+    color: var(--color-charcoal);
+    font-weight: 500;
+  }
+
+  .desktopNav a:hover {
+    color: var(--color-medium-grey);
+  }
+}

@@ -1,0 +1,119 @@
+/* src/pages/Homepage/Homepage.module.css */
+.homepage {
+  text-align: center;
+}
+
+.hero {
+  width: 100%;
+  height: 90vh;
+  color: var(--color-white);
+  position: relative; /* This is crucial for positioning the content on top */
+}
+
+.heroContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  background: none; /* Remove the old background image style */
+  position: relative; /* Changed from absolute to relative is fine, z-index handles stacking */
+  z-index: 2; /* Ensure content is above the slider (z-index: 0) */
+}
+
+.heroContent::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  z-index: -1;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--color-medium-grey);
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btnPrimary,
+.btnSecondary {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btnPrimary {
+  background-color: var(--color-charcoal);
+  color: var(--color-white);
+}
+
+.btnSecondary {
+  background-color: var(--color-white);
+  color: var(--color-charcoal);
+  border: 1px solid var(--color-charcoal);
+}
+
+.btnPrimary:hover {
+  opacity: 0.8;
+}
+
+.btnSecondary:hover {
+  background-color: var(--color-light-grey);
+}
+
+.servicesSection {
+  padding: 4rem 2rem;
+}
+
+.servicesSection h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Tablet and Desktop Styles */
+@media (min-width: 768px) {
+  .hero h1 {
+    font-size: 4rem;
+  }
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* One column on mobile */
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tablet and Desktop Styles */
+@media (min-width: 768px) {
+  .servicesGrid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns on tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .servicesGrid {
+    grid-template-columns: repeat(3, 1fr); /* Three columns on desktop */
+  }
+}
