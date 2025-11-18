@@ -1,65 +1,180 @@
 // src/api/strapi.js
 import axios from "axios";
 
-const strapi = axios.create({
+// Create a single, reusable Axios instance for all API calls
+const API = axios.create({
   baseURL: process.env.REACT_APP_STRAPI_URL,
 });
 
-// Function to fetch data for the homepage
+/**
+ * Fetches the content for the Homepage Single Type.
+ * Includes Hero Title, Subtitle, and Slider Images.
+ */
 export const getHomepageData = async () => {
   try {
-    // The real API call. `populate=*` tells Strapi to include our images.
-    const response = await strapi.get("/api/homepage?populate=*");
-    return response.data.data;
+    const response = await API.get("/api/homepage?populate=*");
+    // As we discovered, our data is directly at response.data.data
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
   } catch (error) {
     console.error("Error fetching homepage data:", error);
     return null;
   }
 };
 
-// Function to fetch all services
+/**
+ * Fetches all entries from the Service Collection Type.
+ * Includes the Picture for each service.
+ */
 export const getServices = async () => {
   try {
-    // We use populate=* to make sure we get the image for each service
-    const response = await strapi.get("/api/services?populate=*");
-
-    // As we discovered, our data is directly in response.data.data
+    const response = await API.get("/api/services?populate=*");
     if (response.data?.data) {
       return response.data.data;
     }
-    return []; // Return an empty array if no data
+    return []; // Return an empty array if no services
   } catch (error) {
     console.error("Error fetching services:", error);
-    return []; // Return an empty array on error
+    return []; // Return an empty array on error for safety
   }
 };
 
-// Function to fetch a single service by ID
-export const getServiceById = async (id) => {
+/**
+ * Fetches a single service by its unique identifier (documentId).
+ * @param {string} identifier - The documentId of the service to fetch.
+ */
+export const getServiceById = async (identifier) => {
   try {
-    // Try using documentId first (Strapi v5 format)
-    const response = await strapi.get(`/api/services/${id}?populate=*`);
-
-    // Log the response for debugging
-    console.log("Service by ID response:", response.data);
-
-    // Strapi v5 returns data in response.data.data
+    const response = await API.get(`/api/services/${identifier}?populate=*`);
     if (response.data?.data) {
       return response.data.data;
     }
     return null;
   } catch (error) {
-    console.error(`Error fetching service with id ${id}:`, error);
-    console.error("Error response:", error.response?.data);
-    console.error("Error status:", error.response?.status);
+    console.error(
+      `Error fetching service with identifier ${identifier}:`,
+      error
+    );
+    return null;
+  }
+};
 
-    // If 404, it might be a documentId vs id issue
-    if (error.response?.status === 404) {
-      console.error(
-        "Service not found. Check if you're using the correct ID format (numeric ID vs documentId)"
-      );
+/**
+ * Fetches the global settings for the booking system.
+ * Includes StartTimeHour, EndTimeHour, SlotIntervalMinutes, etc.
+ */
+export const getBookingSettings = async () => {
+  try {
+    // Strapi uses the plural API ID even for single types
+    const response = await API.get("/api/booking-setting");
+    if (response.data?.data) {
+      return response.data.data;
     }
+    return null;
+  } catch (error) {
+    console.error("Error fetching booking settings:", error);
+    return null;
+  }
+};
 
+/**
+ * Fetches an array of booked time slots (e.g., ["10:00", "14:30"]) for a specific date.
+ * @param {Date} date - The date object for which to fetch booked slots.
+ */
+export const getBookedSlotsForDate = async (date) => {
+  // Format the date to a YYYY-MM-DD string
+  const dateString = date.toISOString().split("T")[0];
+  try {
+    const response = await API.get(
+      `/api/appointments/booked-slots?date=${dateString}`
+    );
+    // Our custom controller returns the array directly in the data property
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching booked slots for ${dateString}:`, error);
+    return [];
+  }
+};
+
+/**
+ * Creates a new appointment in Strapi.
+ * @param {object} appointmentData - The data for the new appointment.
+ */
+export const createAppointment = async (appointmentData) => {
+  try {
+    // Strapi v4/v5 requires the POST body to be wrapped in a `data` object
+    const response = await API.post("/api/appointments", {
+      data: appointmentData,
+    });
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error creating appointment:", error);
+    // You might want to return the error details for better handling in the component
+    return {
+      error: error.response?.data?.error || "An unknown error occurred",
+    };
+  }
+};
+
+export const createPayment = async (paymentData) => {
+  try {
+    const response = await API.post("/api/payments", { data: paymentData });
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error creating payment record:", error);
+    return {
+      error: error.response?.data?.error || "An unknown error occurred",
+    };
+  }
+};
+
+export const getAcademyPageData = async () => {
+  try {
+    const response = await API.get("/api/academy-page?populate=*");
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching academy page data:", error);
+    return null;
+  }
+};
+
+export const getGlobalData = async () => {
+  try {
+    const response = await API.get("/api/global?populate=*"); // Use the plural API ID
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching global data:", error);
+    return null;
+  }
+};
+
+// Add to src/api/strapi.js
+export const getAboutPageData = async () => {
+  try {
+    const response = await API.get("/api/about-page?populate=*");
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching about page data:", error);
     return null;
   }
 };

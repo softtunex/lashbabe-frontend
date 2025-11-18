@@ -1,30 +1,41 @@
-/* src/pages/BookingPage/BookingPage.module.css */
+/* src/pages/BookingPage/BookingPage.module.css - Full Width Calendar Fixed */
 .bookingPage {
-  padding: 2rem;
-  max-width: 500px;
+  padding: 1.5rem;
+  max-width: 900px;
   margin: 2rem auto;
   background-color: var(--color-white);
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
+@media (min-width: 768px) {
+  .bookingPage {
+    padding: 2.5rem;
+    max-width: 1200px;
+  }
+}
+
+/* Progress Tracker */
 .progressTracker {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   text-align: center;
+  gap: 0.5rem;
 }
 
 .progressStep {
   color: var(--color-medium-grey);
   flex: 1;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--color-light-grey);
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--color-light-grey);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
 .progressStep.active {
   color: var(--color-charcoal);
-  border-bottom: 2px solid var(--color-charcoal);
+  border-bottom: 3px solid var(--color-charcoal);
   font-weight: bold;
 }
 
@@ -32,96 +43,447 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .stepContainer h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  text-align: center;
 }
 
-/* Step 1 Styles */
-.timeSlots {
+/* --- Date Time Container - Side by Side on Desktop --- */
+.dateTimeContainer {
   display: flex;
-  gap: 1rem;
-  margin: 1.5rem 0;
-  flex-wrap: wrap;
-  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+}
+
+/* --- Calendar Section --- */
+.calendarSection {
+  flex: 1;
+  min-width: 0;
+}
+
+.calendarSection :global(.react-datepicker) {
+  width: 100% !important;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-family: inherit;
+}
+
+.calendarSection :global(.react-datepicker__month-container) {
+  width: 100% !important;
+  float: none !important;
+}
+
+/* Calendar Header */
+.calendarSection :global(.react-datepicker__header) {
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1.5rem 1rem 1rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.calendarSection :global(.react-datepicker__current-month) {
+  color: var(--color-charcoal);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Day Names - Force full width */
+.calendarSection :global(.react-datepicker__day-names) {
+  display: flex !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.calendarSection :global(.react-datepicker__day-name) {
+  color: var(--color-charcoal);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  flex: 1 !important;
+  margin: 0 !important;
+  text-align: center;
+  padding: 0.5rem 0;
+  line-height: 1;
+}
+
+/* Calendar Month - Force full width */
+.calendarSection :global(.react-datepicker__month) {
+  margin: 0 !important;
+  padding: 1rem !important;
+  width: 100% !important;
+}
+
+/* Week Rows - Force full width */
+.calendarSection :global(.react-datepicker__week) {
+  display: flex !important;
+  width: 100% !important;
+  margin: 0 0 0.5rem 0 !important;
+}
+
+/* Day Cells - Force equal width distribution */
+.calendarSection :global(.react-datepicker__day) {
+  flex: 1 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: 3rem !important;
+  line-height: 3rem !important;
+  margin: 0 0.25rem !important;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  transition: all 0.2s ease;
+  background: transparent;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.calendarSection
+  :global(
+    .react-datepicker__day:hover:not(.react-datepicker__day--disabled):not(
+        .react-datepicker__day--selected
+      )
+  ) {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+/* Today's Date */
+.calendarSection :global(.react-datepicker__day--today) {
+  font-weight: 700;
+  background-color: transparent;
+  border: 2px solid var(--color-charcoal);
+}
+
+/* Selected Date - BLACK */
+.calendarSection :global(.react-datepicker__day--selected) {
+  background-color: var(--color-charcoal) !important;
+  color: white !important;
+  font-weight: 700;
+  transform: scale(1.1);
+}
+
+/* Disabled Dates */
+.calendarSection :global(.react-datepicker__day--disabled) {
+  color: #d0d0d0;
+  cursor: not-allowed;
+}
+
+.calendarSection :global(.react-datepicker__day--disabled:hover) {
+  background-color: transparent;
+  transform: none;
+}
+
+/* Adjacent Month Days */
+.calendarSection :global(.react-datepicker__day--outside-month) {
+  color: #d0d0d0;
+}
+
+/* Navigation Arrows */
+.calendarSection :global(.react-datepicker__navigation) {
+  top: 1.5rem;
+  width: 40px;
+  height: 40px;
+}
+
+.calendarSection :global(.react-datepicker__navigation--previous) {
+  left: 1rem;
+}
+
+.calendarSection :global(.react-datepicker__navigation--next) {
+  right: 1rem;
+}
+
+/* --- Time Slots Section --- */
+.timeSlotsSection {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeSlotsTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.timeSlotsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+}
+
+/* Custom scrollbar */
+.timeSlotsGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timeSlotsGrid::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.timeSlotsGrid::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 10px;
+}
+
+.timeSlotsGrid::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
 }
 
 .timeSlot {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid var(--color-medium-grey);
-  background: none;
-  border-radius: 5px;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
   cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
 }
 
-.timeSlot.selected {
-  background-color: var(--color-charcoal);
-  color: var(--color-white);
+.timeSlot:hover {
+  background-color: #f5f5f5;
   border-color: var(--color-charcoal);
+  transform: scale(1.05);
 }
 
-/* Step 2 Styles */
+/* Selected Time - BLACK */
+.timeSlotSelected {
+  background-color: var(--color-charcoal) !important;
+  color: white !important;
+  border-color: var(--color-charcoal);
+  font-weight: 700;
+  transform: scale(1.05);
+}
+
+.timeSlotSelected:hover {
+  background-color: #1a1a1a !important;
+}
+
+/* --- Mobile: Stack Vertically --- */
+@media (max-width: 767px) {
+  .dateTimeContainer {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .bookingPage {
+    padding: 1rem;
+    margin: 1rem 0.5rem;
+  }
+
+  .stepContainer h2 {
+    font-size: 1.5rem;
+  }
+
+  .calendarSection {
+    width: 100%;
+  }
+
+  .calendarSection :global(.react-datepicker__day) {
+    height: 2.5rem !important;
+    line-height: 2.5rem !important;
+    font-size: 0.9rem;
+  }
+
+  .timeSlotsSection {
+    width: 100%;
+  }
+
+  .timeSlotsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    max-height: 300px;
+  }
+
+  .progressStep {
+    font-size: 0.8rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeSlotsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Step 2 Styles --- */
 .bookingSummary {
   width: 100%;
-  padding: 1rem;
-  background-color: var(--color-light-grey);
-  border-radius: 8px;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 2px solid var(--color-charcoal);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.bookingSummary h3 {
+  font-size: 1.4rem;
   margin-bottom: 1.5rem;
+  color: var(--color-charcoal);
+  font-weight: 700;
 }
 
 .bookingSummary p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  font-size: 1rem;
+  color: #333;
 }
 
 .detailsForm {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .detailsForm input {
-  padding: 0.8rem;
-  border: 1px solid var(--color-light-grey);
-  border-radius: 5px;
+  padding: 1rem 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
   font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: white;
 }
 
-/* Step 3 Styles */
+.detailsForm input:focus {
+  outline: none;
+  border-color: var(--color-charcoal);
+  box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
+}
+
+.detailsForm input::placeholder {
+  color: #999;
+}
+
+/* --- Step 3 Styles --- */
 .confirmation {
   text-align: center;
+  padding: 3rem 1rem;
 }
 
 .checkMark {
-  font-size: 4rem;
-  color: green;
+  font-size: 5rem;
+  display: block;
+  margin-bottom: 1.5rem;
+  animation: checkmarkPop 0.5s ease;
 }
 
-/* Button Styles */
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.confirmation h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-charcoal);
+}
+
+.confirmation p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* --- Button Styles --- */
 .nextButton,
 .backButton {
-  padding: 0.8rem 1.5rem;
+  padding: 1.1rem 2rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   width: 100%;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nextButton:disabled {
+  background-color: #d0d0d0;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .nextButton {
   background-color: var(--color-charcoal);
-  color: var(--color-white);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nextButton:hover:not(:disabled) {
+  background-color: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nextButton:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .backButton {
-  background-color: var(--color-light-grey);
+  background-color: white;
   color: var(--color-charcoal);
+  border: 2px solid var(--color-charcoal);
+}
+
+.backButton:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
 }
 
 .buttonGroup {
   display: flex;
   gap: 1rem;
   width: 100%;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  .buttonGroup {
+    flex-direction: column-reverse;
+  }
+
+  .bookingSummary {
+    padding: 1.5rem;
+  }
 }

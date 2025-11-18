@@ -1,0 +1,63 @@
+/* src/pages/ContactPage/ContactPage.module.css */
+.contactPage {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.contactPage h1 {
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--color-medium-grey);
+  margin-bottom: 4rem;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .contactGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.contactCard {
+  background-color: #f8f9fa;
+  padding: 2.5rem 2rem;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.contactCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.icon {
+  font-size: 2.5rem;
+  color: var(--color-charcoal);
+  margin-bottom: 1.5rem;
+}
+
+.contactCard h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.contactCard p {
+  color: var(--color-medium-grey);
+  line-height: 1.6;
+}
+
+.contactCard a {
+  color: inherit;
+  text-decoration: none;
+}

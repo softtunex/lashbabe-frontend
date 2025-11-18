@@ -1,0 +1,159 @@
+/* src/pages/AcademyPage/AcademyPage.module.css */
+.academyPage {
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+/* --- HERO SECTION STYLES --- */
+.hero {
+  height: 60vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--color-white);
+}
+
+.heroOverlay {
+  position: relative; /* Sits on top of the dark overlay */
+  z-index: 2;
+  padding: 2rem;
+}
+
+/* The dark overlay to make text readable */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+/* --- MAIN CONTENT STYLES --- */
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+  align-items: flex-start;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+
+.learnSection h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-light-grey);
+  padding-bottom: 0.75rem;
+}
+
+/* Style the lists rendered by the BlocksRenderer */
+.learnSection ul {
+  padding-left: 1.5rem;
+}
+
+.learnSection li {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  color: var(--color-medium-grey);
+}
+
+/* Style the paragraphs rendered by the BlocksRenderer */
+.learnSection p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--color-medium-grey);
+  margin-bottom: 1.5rem;
+}
+
+/* Details Card on the right */
+.detailsCard {
+  background-color: #f8f9fa; /* A very light grey */
+  padding: 2rem;
+  border-radius: 8px;
+  position: sticky;
+  top: 120px; /* Makes the card "stick" on scroll. Adjust if header height changes. */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.detailsCard h3 {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-light-grey);
+  padding-bottom: 0.5rem;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+}
+
+.detailItem strong {
+  color: var(--color-charcoal);
+}
+
+.detailItem span {
+  color: var(--color-medium-grey);
+  text-align: right;
+}
+
+.ctaButton {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: var(--color-charcoal);
+  color: var(--color-white);
+  text-decoration: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.ctaButton:hover {
+  opacity: 0.85;
+}
+
+/* --- RESPONSIVE STYLES --- */
+@media (max-width: 900px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .contentWrapper {
+    grid-template-columns: 1fr; /* Stack the columns on smaller screens */
+    margin-top: 2rem;
+    padding: 0 1rem;
+  }
+
+  .detailsCard {
+    position: static; /* Unstick the card on mobile */
+    top: auto;
+  }
+}

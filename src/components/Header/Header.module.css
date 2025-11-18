@@ -20,6 +20,26 @@
   font-weight: 700;
 }
 
+/* Add these styles to your Header.module.css */
+
+.logoLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.logoImage {
+  height: 40px; /* Adjust the height of your logo as needed */
+  width: auto;
+}
+
+.logoText {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+}
+
 /* --- MOBILE STYLES --- */
 
 .overlay {

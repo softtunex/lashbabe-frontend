@@ -1,55 +1,98 @@
 // src/components/Header/Header.jsx
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
+import { getGlobalData } from "../../api/strapi"; // We can reuse this function!
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [globalData, setGlobalData] = useState(null); // State for our global data
+  const navigate = useNavigate();
+
+  // Fetch the global data when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getGlobalData();
+      setGlobalData(data);
+    };
+    fetchData();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  const handleMobileLinkClick = (path) => {
+    navigate(path);
+    toggleMenu();
+  };
+
+  const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
+  const logoUrl = globalData?.Logo?.url
+    ? `${strapiBaseUrl}${globalData.Logo.url}`
+    : null;
 
   return (
     <>
       {/* {isMenuOpen && <div className={styles.overlay} onClick={toggleMenu} />} */}
 
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>
-          LashBabe
-        </Link>{" "}
-        {/* Use Link for the logo */}
+        <Link to="/" className={styles.logoLink}>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="LashBabe Logo"
+              className={styles.logoImage}
+            />
+          ) : (
+            <span className={styles.logoText}>LashBabe</span>
+          )}
+        </Link>
+
         {/* Desktop Navigation */}
         <nav className={styles.desktopNav}>
-          <Link to="/services">Services</Link> {/* Use Link */}
-          <a href="/#about">About</a> {/* Keep as anchor for now */}
-          <a href="/#academy">Academy</a> {/* Keep as anchor for now */}
-          <a href="/#contact">Contact</a> {/* Keep as anchor for now */}
+          <Link to="/services">Services</Link>
+          <Link to="/academy">Academy</Link>
+          <Link to="/about">About</Link> {/* Will link to new page */}
+          <Link to="/contact">Contact</Link> {/* Will link to new page */}
         </nav>
+
         {/* Burger Icon for Mobile */}
         <div className={styles.burger} onClick={toggleMenu}>
           <div />
           <div />
           <div />
         </div>
-        {/* Mobile Navigation Menu (slides in) */}
+
+        {/* Mobile Navigation Menu */}
         <nav className={`${styles.mobileNav} ${isMenuOpen ? styles.open : ""}`}>
           <button className={styles.closeButton} onClick={toggleMenu}>
             &times;
           </button>
-          <Link to="/services" onClick={toggleMenu}>
+          <div
+            className={styles.mobileLink}
+            onClick={() => handleMobileLinkClick("/services")}
+          >
             Services
-          </Link>{" "}
-          {/* Use Link */}
-          <a href="/#about" onClick={toggleMenu}>
-            About
-          </a>
-          <a href="/#academy" onClick={toggleMenu}>
+          </div>
+          <div
+            className={styles.mobileLink}
+            onClick={() => handleMobileLinkClick("/academy")}
+          >
             Academy
-          </a>
-          <a href="/#contact" onClick={toggleMenu}>
+          </div>
+          <div
+            className={styles.mobileLink}
+            onClick={() => handleMobileLinkClick("/about")}
+          >
+            About
+          </div>
+          <div
+            className={styles.mobileLink}
+            onClick={() => handleMobileLinkClick("/contact")}
+          >
             Contact
-          </a>
+          </div>
         </nav>
       </header>
     </>

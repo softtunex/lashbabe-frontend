@@ -24,6 +24,10 @@
   z-index: 2; /* Ensure content is above the slider (z-index: 0) */
 }
 
+.linkWrapper {
+  text-decoration: none; /* Removes the underline from the link */
+}
+
 .heroContent::before {
   content: "";
   position: absolute;
