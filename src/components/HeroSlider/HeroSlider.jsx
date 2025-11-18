@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import styles from "./HeroSlider.module.css";
 
 const HeroSlider = ({ images }) => {
-  const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
+  // const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
 
   const settings = {
     dots: true,
@@ -25,7 +25,7 @@ const HeroSlider = ({ images }) => {
           <div key={image.id}>
             <div
               className={styles.slide}
-              style={{ backgroundImage: `url(${strapiBaseUrl}${image.url})` }}
+              style={{ backgroundImage: `url(${image.url})` }}
             />
           </div>
         ))}

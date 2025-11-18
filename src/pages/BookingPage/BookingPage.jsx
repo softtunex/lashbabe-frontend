@@ -53,7 +53,13 @@ const BookingPage = () => {
           />
         );
       case 3:
-        return <Confirmation bookingDetails={bookingDetails} styles={styles} />;
+        return (
+          <Confirmation
+            bookingDetails={bookingDetails}
+            service={service}
+            styles={styles}
+          />
+        );
       default:
         return <div>Unknown Step</div>;
     }

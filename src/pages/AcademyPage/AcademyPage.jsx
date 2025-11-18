@@ -31,8 +31,6 @@ const AcademyPage = () => {
     return <div>Failed to load page content.</div>;
   }
 
-  // --- THIS IS THE CRITICAL FIX ---
-  const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
   let heroImageUrl = "";
 
   // Check if HeroImage is an array and has at least one item
@@ -41,7 +39,7 @@ const AcademyPage = () => {
     academyData.HeroImage.length > 0
   ) {
     // Access the URL from the first object in the array
-    heroImageUrl = `${strapiBaseUrl}${academyData.HeroImage[0].url}`;
+    heroImageUrl = `${academyData.HeroImage[0].url}`;
   }
   // --- END OF FIX ---
 

@@ -27,10 +27,10 @@ const Header = () => {
     toggleMenu();
   };
 
-  const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
-  const logoUrl = globalData?.Logo?.url
-    ? `${strapiBaseUrl}${globalData.Logo.url}`
-    : null;
+  // const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
+  const logoUrl = globalData?.Logo?.url;
+  // ? `${strapiBaseUrl}${globalData.Logo.url}`
+  // : null;
 
   return (
     <>

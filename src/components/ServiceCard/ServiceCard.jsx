@@ -1,28 +1,35 @@
 // src/components/ServiceCard/ServiceCard.jsx
-// Alternative version using documentId for Strapi v5 compatibility
-
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./ServiceCard.module.css";
 
 const ServiceCard = ({ service }) => {
-  // Use documentId for Strapi v5 - it's more reliable than numeric id
-  const { documentId, id, Name, Duration, Price, Picture } = service;
-
-  // Use documentId if available, fall back to id
+  const {
+    documentId,
+    id,
+    Name,
+    Duration,
+    Price,
+    Picture,
+    OnSalesPrice,
+    OnSaleTitle,
+  } = service;
   const serviceIdentifier = documentId || id;
+  // const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
 
-  const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
+  const imageUrl =
+    Picture?.url || "https://via.placeholder.com/400x300.png?text=No+Image";
 
-  const imageUrl = Picture?.url
-    ? `${strapiBaseUrl}${Picture.url}`
-    : "https://via.placeholder.com/400x300.png?text=No+Image";
-
-  // Debug: log what we're using
-  console.log("Service Card:", { id, documentId, using: serviceIdentifier });
+  // Check if the service is on sale
+  const isOnSale = OnSalesPrice && OnSalesPrice > 0;
 
   return (
     <div className={styles.card}>
+      {/* --- SALE BANNER --- */}
+      {isOnSale && OnSaleTitle && (
+        <div className={styles.saleBanner}>{OnSaleTitle}</div>
+      )}
+
       <div className={styles.imageContainer}>
         <img src={imageUrl} alt={Name} />
       </div>
@@ -30,9 +37,19 @@ const ServiceCard = ({ service }) => {
         <h3>{Name}</h3>
         <div className={styles.details}>
           <span>Duration: {Duration}mins</span>
-          <span>Price: ₦{Price.toLocaleString()}</span>
+
+          {/* --- CONDITIONAL PRICE DISPLAY --- */}
+          {isOnSale ? (
+            <div className={styles.priceContainer}>
+              <span className={styles.salePrice}>
+                ₦{OnSalesPrice.toLocaleString()}
+              </span>
+              <s className={styles.originalPrice}>₦{Price.toLocaleString()}</s>
+            </div>
+          ) : (
+            <span className={styles.price}>₦{Price.toLocaleString()}</span>
+          )}
         </div>
-        {/* Use the service identifier (documentId or id) */}
         <Link
           to={`/booking/${serviceIdentifier}`}
           className={styles.bookButtonLink}

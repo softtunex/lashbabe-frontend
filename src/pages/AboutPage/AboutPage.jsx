@@ -20,10 +20,7 @@ const AboutPage = () => {
     return <Loader />;
   }
 
-  const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
-  const imageUrl = aboutData.MainImage?.url
-    ? `${strapiBaseUrl}${aboutData.MainImage.url}`
-    : "";
+  const imageUrl = aboutData.MainImage?.url;
 
   return (
     <div className={styles.aboutPage}>

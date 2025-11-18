@@ -106,7 +106,10 @@ const EnterDetails = ({ onNext, onBack, bookingDetails, service, styles }) => {
           <strong>Duration:</strong> {service.Duration} minutes
         </p>
         <p>
-          <strong>Price:</strong> ₦{service.Price?.toLocaleString()}
+          <strong>Price:</strong> ₦
+          {service.OnSalesPrice
+            ? service.OnSalesPrice?.toLocaleString()
+            : service.Price?.toLocaleString()}
         </p>
         <p>
           <strong>Deposit Required:</strong> ₦

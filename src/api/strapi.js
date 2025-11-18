@@ -178,3 +178,20 @@ export const getAboutPageData = async () => {
     return null;
   }
 };
+
+// Add this to src/api/strapi.js
+export const getActivePromotions = async () => {
+  try {
+    // Filter to get only promotions where IsActive is true
+    const response = await API.get(
+      "/api/promotions?filters[IsActive][$eq]=true&populate=*"
+    );
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching active promotions:", error);
+    return [];
+  }
+};

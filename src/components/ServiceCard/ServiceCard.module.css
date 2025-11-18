@@ -2,18 +2,35 @@
 .card {
   background-color: var(--color-white);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; /* This is crucial for the banner effect */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition:
     transform 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
+  position: relative; /* Needed for the absolute-positioned banner */
 }
 
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* --- NEW: Sale Banner Style --- */
+.saleBanner {
+  position: absolute;
+  top: 40px;
+  left: -40px;
+  transform: rotate(-45deg);
+  background-color: #e53e3e; /* A nice red color */
+  color: white;
+  padding: 0.3rem 3rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1;
 }
 
 .imageContainer {
@@ -43,18 +60,43 @@
 .details {
   display: flex;
   justify-content: space-between;
-  color: var(--color-medium-grey);
+  align-items: center; /* Align items vertically */
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
+/* --- NEW: Price Styling --- */
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.price {
+  color: var(--color-charcoal);
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.salePrice {
+  color: var(--color-charcoal);
+  font-weight: bold;
+  font-size: 1.1rem; /* Make the sale price slightly larger */
+}
+
+.originalPrice {
+  text-decoration: line-through;
+  color: var(--color-medium-grey);
+  font-size: 0.9rem;
+}
+
+/* --- Button Styling --- */
 .bookButtonLink {
   text-decoration: none;
-  margin-top: auto; /* This was on the button, move it to the link */
+  margin-top: auto;
 }
 
 .bookButton {
-  margin-top: auto; /* Pushes button to the bottom */
   width: 100%;
   padding: 0.8rem 1.5rem;
   border: none;
