@@ -1,15 +1,16 @@
 /* src/components/ServiceCard/ServiceCard.module.css */
+
 .card {
   background-color: var(--color-white);
   border-radius: 8px;
-  overflow: hidden; /* This is crucial for the banner effect */
+  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition:
     transform 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
-  position: relative; /* Needed for the absolute-positioned banner */
+  position: relative;
 }
 
 .card:hover {
@@ -17,13 +18,13 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* --- NEW: Sale Banner Style --- */
+/* --- Sale Banner Style --- */
 .saleBanner {
   position: absolute;
   top: 40px;
   left: -40px;
   transform: rotate(-45deg);
-  background-color: #e53e3e; /* A nice red color */
+  background-color: #e53e3e;
   color: white;
   padding: 0.3rem 3rem;
   font-size: 0.9rem;
@@ -36,6 +37,8 @@
 .imageContainer {
   height: 200px;
   width: 100%;
+  /* Optional: Add a background color in case image loads slowly */
+  background-color: #f9f9f9;
 }
 
 .imageContainer img {
@@ -43,6 +46,23 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* --- NEW: Placeholder Styles (Add this) --- */
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6; /* Light grey background */
+  color: #9ca3af; /* Muted grey for the icon */
+}
+
+.placeholderIcon {
+  font-size: 7.5rem; /* Icon size */
+  opacity: 0.7;
+}
+/* --------------------------------------- */
 
 .content {
   padding: 1rem;
@@ -60,12 +80,12 @@
 .details {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Align items vertically */
+  align-items: center;
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
-/* --- NEW: Price Styling --- */
+/* --- Price Styling --- */
 .priceContainer {
   display: flex;
   align-items: baseline;
@@ -81,7 +101,7 @@
 .salePrice {
   color: var(--color-charcoal);
   font-weight: bold;
-  font-size: 1.1rem; /* Make the sale price slightly larger */
+  font-size: 1.1rem;
 }
 
 .originalPrice {
