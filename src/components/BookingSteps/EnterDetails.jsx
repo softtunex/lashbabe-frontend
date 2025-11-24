@@ -1,4 +1,4 @@
-// src/components/BookingSteps/EnterDetails.jsx (Relationship Temporarily Removed)
+// src/components/BookingSteps/EnterDetails.jsx
 import React, { useState } from "react";
 import { PaystackButton } from "react-paystack";
 import { createAppointment, createPayment } from "../../api/strapi";
@@ -18,14 +18,12 @@ const EnterDetails = ({ onNext, onBack, bookingDetails, service, styles }) => {
     }));
   };
 
-  // Prevent the form from causing a page refresh
   const handleSubmit = (e) => {
     e.preventDefault();
   };
 
-  const depositAmount = (service.Deposit || 10000) * 100; // in kobo
+  const depositAmount = (service.Deposit || 10000) * 100;
 
-  // Props for the Paystack button component
   const componentProps = {
     email: formData.email,
     amount: depositAmount,
@@ -37,36 +35,32 @@ const EnterDetails = ({ onNext, onBack, bookingDetails, service, styles }) => {
       const reference = transaction.reference;
       console.log("Payment successful. Reference:", reference);
 
-      // --- 1. CREATE PAYMENT RECORD (We still want to track this) ---
       const paymentData = {
         Reference: reference,
-        Amount: depositAmount / 100, // Store amount in Naira
+        Amount: depositAmount / 100,
         ClientEmail: formData.email,
         PaymentStatus: "Success",
       };
 
-      // We will create the payment record but won't stop the flow if it fails.
-      // The appointment creation is the most critical part for the user.
       await createPayment(paymentData);
       console.log("Attempted to create payment record in Strapi.");
 
-      // --- 2. CREATE THE APPOINTMENT (without the payment link) ---
+      // --- FIX: Use documentId instead of id for the service relation ---
       const appointmentData = {
         ClientName: formData.fullName,
         ClientEmail: formData.email,
         ClientPhone: formData.phone,
         AppointmentDateTime: bookingDetails.dateTime.toISOString(),
         BookingStatus: "Confirmed",
-        service: service.id,
-        // The problematic "payment" key has been removed for now.
+        service: service.documentId, // Changed from service.id to service.documentId
       };
+
+      console.log("Creating appointment with data:", appointmentData); // Debug log
 
       const newAppointment = await createAppointment(appointmentData);
 
       if (newAppointment && !newAppointment.error) {
         console.log("Appointment created successfully:", newAppointment);
-
-        // --- 3. PROCEED TO THE CONFIRMATION PAGE ---
         onNext({ ...formData, paymentReference: reference });
       } else {
         console.error(

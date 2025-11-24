@@ -1,43 +1,177 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#1a1a1a" />
+
+    <!-- Primary Meta Tags -->
+    <title>
+      LashBabe - Professional Lash Extensions & Beauty Services in Lagos
+    </title>
+    <meta
+      name="title"
+      content="LashBabe - Professional Lash Extensions & Beauty Services in Lagos"
+    />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Book premium lash extensions, beauty treatments, and professional lash training in Lagos. Expert lash technicians offering classic, volume, and hybrid lash services. Elevating beauty and building lash professionals."
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <meta
+      name="keywords"
+      content="lash extensions Lagos, eyelash extensions Nigeria, lash training Lagos, beauty services Lagos, volume lashes, classic lashes, hybrid lashes, lash academy Nigeria, professional lash artist, beauty salon Lagos, lash lift Lagos, brow services Lagos"
+    />
+    <meta name="author" content="LashBabe" />
+    <meta name="robots" content="index, follow" />
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="NG-LA" />
+    <meta name="geo.placename" content="Lagos" />
+    <meta name="geo.position" content="6.5244;3.3792" />
+    <meta name="ICBM" content="6.5244, 3.3792" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lashbabe.com/" />
+    <meta
+      property="og:title"
+      content="LashBabe - Professional Lash Extensions & Beauty Services in Lagos"
+    />
+    <meta
+      property="og:description"
+      content="Book premium lash extensions, beauty treatments, and professional lash training in Lagos. Expert lash technicians offering classic, volume, and hybrid lash services."
+    />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="LashBabe" />
+    <meta property="og:locale" content="en_NG" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://lashbabe.com/" />
+    <meta
+      property="twitter:title"
+      content="LashBabe - Professional Lash Extensions & Beauty Services in Lagos"
+    />
+    <meta
+      property="twitter:description"
+      content="Book premium lash extensions, beauty treatments, and professional lash training in Lagos. Expert lash technicians offering classic, volume, and hybrid lash services."
+    />
+    <meta property="twitter:image" content="%PUBLIC_URL%/twitter-image.jpg" />
+
+    <!-- Additional Meta Tags -->
+    <meta name="format-detection" content="telephone=yes" />
+    <meta name="contact" content="09134386487" />
+    <meta name="contact" content="lashbabeng@gmail.com" />
+    <link rel="canonical" href="https://lashbabe.com/" />
+
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="%PUBLIC_URL%/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="%PUBLIC_URL%/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="%PUBLIC_URL%/favicon-16x16.png"
+    />
+
+    <!-- Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BeautySalon",
+        "name": "LashBabe",
+        "image": "%PUBLIC_URL%/logo.png",
+        "description": "Professional lash extensions, beauty services, and lash training academy in Lagos, Nigeria. Elevating beauty and building lash professionals.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 10, Ayato Street, Iwaya",
+          "addressLocality": "Yaba",
+          "addressRegion": "Lagos",
+          "addressCountry": "NG"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 6.5244,
+          "longitude": 3.3792
+        },
+        "url": "https://lashbabe.com",
+        "telephone": "+234-913-438-6487",
+        "email": "lashbabeng@gmail.com",
+        "priceRange": "₦₦₦",
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ],
+            "opens": "09:00",
+            "closes": "18:00"
+          }
+        ],
+        "sameAs": [
+          "https://www.instagram.com/lashbabe_ng",
+          "https://www.tiktok.com/@lashbabe_ng"
+        ],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Lash & Beauty Services",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Classic Lash Extensions",
+                "description": "Natural-looking individual lash extensions"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Volume Lash Extensions",
+                "description": "Fuller, dramatic lash look with multiple extensions per natural lash"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Lash Training Academy",
+                "description": "Professional lash artist training and certification courses"
+              }
+            }
+          ]
+        }
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>
