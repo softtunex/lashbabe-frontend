@@ -1,0 +1,365 @@
+/* src/pages/CartPage/CartPage.module.css */
+
+.cartPage {
+  min-height: 80vh;
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
+
+.cartContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: var(--color-white);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cartContainer h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: var(--font-heading);
+}
+
+/* Empty Cart State */
+.emptyCart {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.emptyIcon {
+  font-size: 5rem;
+  color: var(--color-medium-grey);
+  margin-bottom: 1.5rem;
+}
+
+.emptyCart h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-charcoal);
+}
+
+.emptyCart p {
+  color: var(--color-medium-grey);
+  margin-bottom: 2rem;
+}
+
+/* Cart Items */
+.cartItems {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cartItem {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.cartItem:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cartItem img,
+.placeholderImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.placeholderImage {
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: var(--color-medium-grey);
+}
+
+.itemDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.itemDetails h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-charcoal);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addOnBadge {
+  font-size: 0.7rem;
+  background-color: var(--color-charcoal);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.duration {
+  color: var(--color-medium-grey);
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.price {
+  color: var(--color-charcoal);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: #e53e3e;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.2s ease;
+  align-self: center;
+}
+
+.removeButton:hover {
+  transform: scale(1.1);
+}
+
+/* Cart Summary */
+.cartSummary {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.summaryRow:last-child {
+  border-bottom: none;
+  padding-top: 1rem;
+  font-size: 1.1rem;
+}
+
+.summaryRow span {
+  color: var(--color-medium-grey);
+}
+
+.summaryRow strong {
+  color: var(--color-charcoal);
+  font-size: 1.1rem;
+}
+
+/* Action Buttons */
+.cartActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.btnPrimary,
+.btnSecondary {
+  /* flex: 1; */
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.btnPrimary {
+  background-color: var(--color-charcoal);
+  color: var(--color-white);
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btnSecondary {
+  background-color: var(--color-white);
+  color: var(--color-charcoal);
+  border: 2px solid var(--color-charcoal);
+}
+
+.btnSecondary:hover {
+  background-color: #f5f5f5;
+}
+
+/* Staff Selection */
+.staffSelect {
+  padding: 1rem 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: white;
+  cursor: pointer;
+}
+
+.staffSelect:focus {
+  outline: none;
+  border-color: var(--color-charcoal);
+  box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
+}
+
+/* Service Item in Booking Summary */
+.serviceItem {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.serviceItem:last-child {
+  border-bottom: none;
+}
+
+.serviceItem .addOnBadge {
+  font-size: 0.7rem;
+  background-color: var(--color-charcoal);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+
+.serviceDuration {
+  color: var(--color-medium-grey);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .cartPage {
+    padding: 1rem;
+  }
+
+  .cartContainer {
+    padding: 1.5rem;
+  }
+
+  .cartContainer h1 {
+    font-size: 1.5rem;
+  }
+
+  .cartItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cartItem img,
+  .placeholderImage {
+    width: 100%;
+    height: 150px;
+  }
+
+  .removeButton {
+    align-self: flex-end;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .cartItem {
+    position: relative;
+  }
+
+  .cartActions {
+    flex-direction: column;
+  }
+}
+
+/* --- Suggestions Section Styles --- */
+.suggestionsSection {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed #e0e0e0;
+}
+
+.suggestionsSection h3 {
+  font-size: 1.2rem;
+  color: var(--color-charcoal);
+  margin-bottom: 1rem;
+}
+
+.suggestionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.suggestionCard {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.suggestionCard:hover {
+  border-color: var(--color-charcoal);
+  background-color: #fafafa;
+}
+
+.suggestionInfo h4 {
+  font-size: 0.95rem;
+  margin: 0 0 0.2rem 0;
+  color: var(--color-charcoal);
+}
+
+.suggestionInfo p {
+  font-size: 0.85rem;
+  color: var(--color-medium-grey);
+  margin: 0;
+}
+
+.addSuggestionBtn {
+  background-color: white;
+  border: 1px solid var(--color-charcoal);
+  color: var(--color-charcoal);
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.addSuggestionBtn:hover {
+  background-color: var(--color-charcoal);
+  color: white;
+}

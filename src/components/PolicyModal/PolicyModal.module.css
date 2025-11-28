@@ -1,0 +1,108 @@
+/* src/components/PolicyModal/PolicyModal.module.css */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: white;
+  width: 90%;
+  max-width: 550px;
+  max-height: 85vh;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.closeIcon {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.header {
+  padding: 1.5rem 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border-bottom: 1px solid #eee;
+}
+
+.shieldIcon {
+  font-size: 1.8rem;
+  color: #1a1a1a;
+}
+
+.header h2 {
+  font-size: 1.4rem;
+  font-family: serif; /* Matching the font vibe in your screenshot */
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* Specific styling to match the screenshot text */
+.content {
+  color: #333;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.content h3,
+.content h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #000;
+  font-weight: bold;
+}
+
+.footer {
+  padding: 1.5rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  background-color: #fff;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 500px) {
+  .footer {
+    flex-direction: column-reverse;
+  }
+}

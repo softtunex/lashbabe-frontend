@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { getServices } from "../../api/strapi";
 import Loader from "../../components/Loader/Loader";
-import ServiceCard from "../../components/ServiceCard/ServiceCard"; // Reusing our component!
+import ServiceCard from "../../components/ServiceCard/ServiceCard";
 import styles from "./ServicesPage.module.css";
 
 const ServicesPage = () => {
@@ -13,7 +13,17 @@ const ServicesPage = () => {
     const fetchServices = async () => {
       try {
         const servicesRes = await getServices();
-        setServices(servicesRes);
+
+        // SORTING: Main services first, Add-Ons last
+        const sortedServices = servicesRes.sort((a, b) => {
+          // If a is AddOn and b is not, a goes last (return 1)
+          // If a is not AddOn and b is, a goes first (return -1)
+          if (a.IsAddOn && !b.IsAddOn) return 1;
+          if (!a.IsAddOn && b.IsAddOn) return -1;
+          return 0; // Keep original order if both are same type
+        });
+
+        setServices(sortedServices);
       } catch (error) {
         console.error("Failed to fetch services", error);
       } finally {

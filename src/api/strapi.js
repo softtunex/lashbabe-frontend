@@ -105,9 +105,9 @@ export const getBookedSlotsForDate = async (date) => {
  * Creates a new appointment in Strapi.
  * @param {object} appointmentData - The data for the new appointment.
  */
+
 export const createAppointment = async (appointmentData) => {
   try {
-    // Strapi v4/v5 requires the POST body to be wrapped in a `data` object
     const response = await API.post("/api/appointments", {
       data: appointmentData,
     });
@@ -117,7 +117,6 @@ export const createAppointment = async (appointmentData) => {
     return null;
   } catch (error) {
     console.error("Error creating appointment:", error);
-    // You might want to return the error details for better handling in the component
     return {
       error: error.response?.data?.error || "An unknown error occurred",
     };
@@ -193,5 +192,44 @@ export const getActivePromotions = async () => {
   } catch (error) {
     console.error("Error fetching active promotions:", error);
     return [];
+  }
+};
+
+// Add to src/api/strapi.js
+
+/**
+ * Fetches available staff from booking settings
+ */
+export const getAvailableStaff = async () => {
+  try {
+    // FIX: Changed 'AvailableStaff' to 'available_staffs' to match your Strapi Schema
+    const response = await API.get(
+      "/api/booking-setting?populate[available_staffs][filters][IsAvailable][$eq]=true"
+    );
+
+    // Check if the data exists under the corrected key
+    if (response.data?.data?.available_staffs) {
+      return response.data.data.available_staffs;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching available staff:", error);
+    return [];
+  }
+};
+
+/**
+ * Fetches booking policy
+ */
+export const getBookingPolicy = async () => {
+  try {
+    const response = await API.get("/api/booking-policy?populate=*");
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching booking policy:", error);
+    return null;
   }
 };

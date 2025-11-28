@@ -1,4 +1,4 @@
-/* src/pages/BookingPage/BookingPage.module.css - Full Width Calendar Fixed */
+/* src/pages/BookingPage/BookingPage.module.css */
 .bookingPage {
   padding: 1.5rem;
   max-width: 900px;
@@ -99,7 +99,7 @@
   margin-bottom: 1.2rem;
 }
 
-/* Day Names - Force full width */
+/* Day Names */
 .calendarSection :global(.react-datepicker__day-names) {
   display: flex !important;
   width: 100% !important;
@@ -119,21 +119,21 @@
   line-height: 1;
 }
 
-/* Calendar Month - Force full width */
+/* Calendar Month */
 .calendarSection :global(.react-datepicker__month) {
   margin: 0 !important;
   padding: 1rem !important;
   width: 100% !important;
 }
 
-/* Week Rows - Force full width */
+/* Week Rows */
 .calendarSection :global(.react-datepicker__week) {
   display: flex !important;
   width: 100% !important;
   margin: 0 0 0.5rem 0 !important;
 }
 
-/* Day Cells - Force equal width distribution */
+/* Day Cells */
 .calendarSection :global(.react-datepicker__day) {
   flex: 1 !important;
   min-width: 0 !important;
@@ -163,14 +163,12 @@
   transform: scale(1.05);
 }
 
-/* Today's Date */
 .calendarSection :global(.react-datepicker__day--today) {
   font-weight: 700;
   background-color: transparent;
   border: 2px solid var(--color-charcoal);
 }
 
-/* Selected Date - BLACK */
 .calendarSection :global(.react-datepicker__day--selected) {
   background-color: var(--color-charcoal) !important;
   color: white !important;
@@ -178,7 +176,6 @@
   transform: scale(1.1);
 }
 
-/* Disabled Dates */
 .calendarSection :global(.react-datepicker__day--disabled) {
   color: #d0d0d0;
   cursor: not-allowed;
@@ -189,12 +186,10 @@
   transform: none;
 }
 
-/* Adjacent Month Days */
 .calendarSection :global(.react-datepicker__day--outside-month) {
   color: #d0d0d0;
 }
 
-/* Navigation Arrows */
 .calendarSection :global(.react-datepicker__navigation) {
   top: 1.5rem;
   width: 40px;
@@ -237,7 +232,6 @@
   background: white;
 }
 
-/* Custom scrollbar */
 .timeSlotsGrid::-webkit-scrollbar {
   width: 6px;
 }
@@ -275,7 +269,6 @@
   transform: scale(1.05);
 }
 
-/* Selected Time - BLACK */
 .timeSlotSelected {
   background-color: var(--color-charcoal) !important;
   color: white !important;
@@ -286,53 +279,6 @@
 
 .timeSlotSelected:hover {
   background-color: #1a1a1a !important;
-}
-
-/* --- Mobile: Stack Vertically --- */
-@media (max-width: 767px) {
-  .dateTimeContainer {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .bookingPage {
-    padding: 1rem;
-    margin: 1rem 0.5rem;
-  }
-
-  .stepContainer h2 {
-    font-size: 1.5rem;
-  }
-
-  .calendarSection {
-    width: 100%;
-  }
-
-  .calendarSection :global(.react-datepicker__day) {
-    height: 2.5rem !important;
-    line-height: 2.5rem !important;
-    font-size: 0.9rem;
-  }
-
-  .timeSlotsSection {
-    width: 100%;
-  }
-
-  .timeSlotsGrid {
-    grid-template-columns: repeat(3, 1fr);
-    max-height: 300px;
-  }
-
-  .progressStep {
-    font-size: 0.8rem;
-    padding-bottom: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .timeSlotsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 /* --- Step 2 Styles --- */
@@ -360,6 +306,42 @@
   color: #333;
 }
 
+.bookingSummary hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Service Items in Booking Summary */
+.serviceItem {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.serviceItem:last-of-type {
+  border-bottom: none;
+}
+
+.serviceItem p {
+  margin: 0.25rem 0;
+}
+
+.serviceItem .addOnBadge {
+  font-size: 0.7rem;
+  background-color: var(--color-charcoal);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+
+.serviceDuration {
+  color: var(--color-medium-grey);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
 .detailsForm {
   display: flex;
   flex-direction: column;
@@ -367,7 +349,8 @@
   gap: 1.2rem;
 }
 
-.detailsForm input {
+.detailsForm input,
+.detailsForm select {
   padding: 1rem 1.2rem;
   border: 2px solid #e0e0e0;
   border-radius: 10px;
@@ -376,7 +359,8 @@
   background-color: white;
 }
 
-.detailsForm input:focus {
+.detailsForm input:focus,
+.detailsForm select:focus {
   outline: none;
   border-color: var(--color-charcoal);
   box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
@@ -386,13 +370,28 @@
   color: #999;
 }
 
+/* Staff Selection Dropdown */
+.staffSelect {
+  padding: 1rem 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: white;
+  cursor: pointer;
+}
+
+.staffSelect:focus {
+  outline: none;
+  border-color: var(--color-charcoal);
+  box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
+}
+
 /* --- Step 3 Styles --- */
 .confirmation {
   text-align: center;
   padding: 3rem 1rem;
 }
-
-/* Add these new styles to BookingPage.module.css */
 
 .confirmationButtons {
   display: flex;
@@ -400,12 +399,11 @@
   justify-content: center;
   gap: 1rem;
   width: 100%;
-  max-width: 300px; /* Constrain button width */
+  max-width: 300px;
   margin: 0 auto;
 }
 
 .secondaryButton {
-  /* Inherit from nextButton and backButton */
   padding: 1.1rem 2rem;
   border: none;
   border-radius: 10px;
@@ -416,8 +414,6 @@
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-
-  /* Unique styles */
   background-color: var(--color-light-grey);
   color: var(--color-charcoal);
   border: 2px solid var(--color-light-grey);
@@ -514,6 +510,47 @@
   margin-top: 2rem;
 }
 
+/* --- Mobile Styles --- */
+@media (max-width: 767px) {
+  .dateTimeContainer {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .bookingPage {
+    padding: 1rem;
+    margin: 1rem 0.5rem;
+  }
+
+  .stepContainer h2 {
+    font-size: 1.5rem;
+  }
+
+  .calendarSection {
+    width: 100%;
+  }
+
+  .calendarSection :global(.react-datepicker__day) {
+    height: 2.5rem !important;
+    line-height: 2.5rem !important;
+    font-size: 0.9rem;
+  }
+
+  .timeSlotsSection {
+    width: 100%;
+  }
+
+  .timeSlotsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    max-height: 300px;
+  }
+
+  .progressStep {
+    font-size: 0.8rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
 @media (max-width: 640px) {
   .buttonGroup {
     flex-direction: column-reverse;
@@ -521,5 +558,9 @@
 
   .bookingSummary {
     padding: 1.5rem;
+  }
+
+  .timeSlotsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

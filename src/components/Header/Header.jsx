@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
-import { getGlobalData } from "../../api/strapi"; // We can reuse this function!
+import { getGlobalData } from "../../api/strapi";
+import CartIcon from "../CartIcon/CartIcon"; // Import CartIcon
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [globalData, setGlobalData] = useState(null); // State for our global data
+  const [globalData, setGlobalData] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch the global data when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       const data = await getGlobalData();
@@ -27,15 +27,10 @@ const Header = () => {
     toggleMenu();
   };
 
-  // const strapiBaseUrl = process.env.REACT_APP_STRAPI_URL;
   const logoUrl = globalData?.Logo?.url;
-  // ? `${strapiBaseUrl}${globalData.Logo.url}`
-  // : null;
 
   return (
     <>
-      {/* {isMenuOpen && <div className={styles.overlay} onClick={toggleMenu} />} */}
-
       <header className={styles.header}>
         <Link to="/" className={styles.logoLink}>
           {logoUrl ? (
@@ -53,15 +48,20 @@ const Header = () => {
         <nav className={styles.desktopNav}>
           <Link to="/services">Services</Link>
           <Link to="/academy">Academy</Link>
-          <Link to="/about">About</Link> {/* Will link to new page */}
-          <Link to="/contact">Contact</Link> {/* Will link to new page */}
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
+          <CartIcon /> {/* Cart icon for desktop */}
         </nav>
 
-        {/* Burger Icon for Mobile */}
-        <div className={styles.burger} onClick={toggleMenu}>
-          <div />
-          <div />
-          <div />
+        {/* Mobile right section: Cart + Burger */}
+        <div className={styles.mobileRight}>
+          <CartIcon /> {/* Cart icon for mobile */}
+          {/* Burger Icon for Mobile */}
+          <div className={styles.burger} onClick={toggleMenu}>
+            <div />
+            <div />
+            <div />
+          </div>
         </div>
 
         {/* Mobile Navigation Menu */}

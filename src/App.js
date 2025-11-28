@@ -2,16 +2,18 @@
 import { Routes, Route } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { FaGift } from "react-icons/fa";
+import { CartProvider } from "./context/CartContext"; // Import CartProvider
 import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer"; // Import Footer
-import PromotionModal from "./components/PromotionModal/PromotionModal"; // Import the modal
-import { getActivePromotions } from "./api/strapi"; // Import the new API function
+import Footer from "./components/Footer/Footer";
+import PromotionModal from "./components/PromotionModal/PromotionModal";
+import { getActivePromotions } from "./api/strapi";
 import Homepage from "./pages/Homepage/Homepage";
 import ServicesPage from "./pages/ServicesPage/ServicesPage";
 import BookingPage from "./pages/BookingPage/BookingPage";
+import CartPage from "./pages/CartPage/CartPage"; // New cart page
 import AcademyPage from "./pages/AcademyPage/AcademyPage";
-import AboutPage from "./pages/AboutPage/AboutPage"; // Import AboutPage
-import ContactPage from "./pages/ContactPage/ContactPage"; // Import ContactPage
+import AboutPage from "./pages/AboutPage/AboutPage";
+import ContactPage from "./pages/ContactPage/ContactPage";
 
 const promoIconStyle = {
   position: "fixed",
@@ -40,14 +42,11 @@ function App() {
       const promoData = await getActivePromotions();
       setPromotions(promoData);
 
-      // --- SESSION LOGIC ---
-      // Check sessionStorage to see if the modal has been shown in this session
       const hasSeenPromo = sessionStorage.getItem("hasSeenPromo");
 
-      // If there are promotions AND the user hasn't seen them yet...
       if (promoData.length > 0 && !hasSeenPromo) {
-        setIsPromoModalOpen(true); // Open the modal automatically
-        sessionStorage.setItem("hasSeenPromo", "true"); // Mark as seen
+        setIsPromoModalOpen(true);
+        sessionStorage.setItem("hasSeenPromo", "true");
       }
     };
 
@@ -58,31 +57,34 @@ function App() {
   const closePromoModal = () => setIsPromoModalOpen(false);
 
   return (
-    <div className="App">
-      <Header />
-      <main>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/academy" element={<AcademyPage />} />
-          <Route path="/booking/:serviceId" element={<BookingPage />} />
-          <Route path="/about" element={<AboutPage />} />{" "}
-          {/* Add About route */}
-          <Route path="/contact" element={<ContactPage />} />{" "}
-          {/* Add Contact route */}
-        </Routes>
-      </main>
-      <Footer /> {/* Add Footer */}
-      {/* --- PROMOTION FEATURE --- */}
-      {/* The fixed icon to re-open the modal */}
-      <div style={promoIconStyle} onClick={openPromoModal}>
-        <FaGift />
+    <CartProvider>
+      <div className="App">
+        <Header />
+        <main>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/academy" element={<AcademyPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/booking" element={<BookingPage />} />{" "}
+            {/* Cart-based booking */}
+            <Route path="/booking/:serviceId" element={<BookingPage />} />{" "}
+            {/* Single service booking */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Routes>
+        </main>
+        <Footer />
+
+        <div style={promoIconStyle} onClick={openPromoModal}>
+          <FaGift />
+        </div>
+
+        {isPromoModalOpen && (
+          <PromotionModal promotions={promotions} onClose={closePromoModal} />
+        )}
       </div>
-      {/* The modal, which only renders when open */}
-      {isPromoModalOpen && (
-        <PromotionModal promotions={promotions} onClose={closePromoModal} />
-      )}
-    </div>
+    </CartProvider>
   );
 }
 

@@ -1,44 +1,72 @@
 // src/components/ServiceCard/ServiceCard.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-// 1. Import the icon you want to use
+import { useNavigate } from "react-router-dom";
 import { GiEyelashes } from "react-icons/gi";
+import { useCart } from "../../context/CartContext";
 import styles from "./ServiceCard.module.css";
 
 const ServiceCard = ({ service }) => {
+  const navigate = useNavigate();
+  const { addToCart, canAddService, cart } = useCart();
   const {
     documentId,
-    id,
     Name,
     Duration,
     Price,
     Picture,
     OnSalesPrice,
     OnSaleTitle,
+    IsAddOn,
   } = service;
 
-  const serviceIdentifier = documentId || id;
-
-  // 2. Check if the service is on sale
   const isOnSale = OnSalesPrice && OnSalesPrice > 0;
-
-  // 3. Check if an image exists
   const hasImage = Picture && Picture.url;
+  const isInCart = cart.some((item) => item.documentId === documentId);
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+
+    if (!canAddService(service)) {
+      alert(
+        "You can only book ONE main service at a time. You can add multiple add-ons to your booking."
+      );
+      return;
+    }
+
+    addToCart(service);
+  };
+
+  const handleBookNow = (e) => {
+    e.preventDefault();
+
+    if (!isInCart) {
+      if (!canAddService(service)) {
+        alert(
+          "You can only book ONE main service at a time. You can add multiple add-ons to your booking."
+        );
+        return;
+      }
+      addToCart(service);
+    }
+
+    navigate("/cart");
+  };
+
+  // Dynamic Button Text
+  const addButtonText = IsAddOn ? "Add Add-On" : "Add Service";
 
   return (
     <div className={styles.card}>
-      {/* --- SALE BANNER --- */}
       {isOnSale && OnSaleTitle && (
         <div className={styles.saleBanner}>{OnSaleTitle}</div>
       )}
 
-      {/* --- IMAGE OR ICON LOGIC --- */}
+      {IsAddOn && <div className={styles.addOnBadge}>Add-On</div>}
+
       <div className={styles.imageContainer}>
         {hasImage ? (
-          // If image exists:
           <img src={Picture.url} alt={Name} />
         ) : (
-          // If NO image exists:
           <div className={styles.placeholder}>
             <GiEyelashes className={styles.placeholderIcon} />
           </div>
@@ -50,7 +78,6 @@ const ServiceCard = ({ service }) => {
         <div className={styles.details}>
           <span>Duration: {Duration}mins</span>
 
-          {/* --- CONDITIONAL PRICE DISPLAY --- */}
           {isOnSale ? (
             <div className={styles.priceContainer}>
               <span className={styles.salePrice}>
@@ -63,12 +90,28 @@ const ServiceCard = ({ service }) => {
           )}
         </div>
 
-        <Link
-          to={`/booking/${serviceIdentifier}`}
-          className={styles.bookButtonLink}
-        >
-          <button className={styles.bookButton}>Book Now</button>
-        </Link>
+        <div className={styles.buttonGroup}>
+          {!isInCart ? (
+            <>
+              <button
+                className={styles.addToCartButton}
+                onClick={handleAddToCart}
+              >
+                {addButtonText}
+              </button>
+              <button className={styles.bookButton} onClick={handleBookNow}>
+                Book Now
+              </button>
+            </>
+          ) : (
+            <button
+              className={styles.inCartButton}
+              onClick={() => navigate("/cart")}
+            >
+              ✓ Added - View Service
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
