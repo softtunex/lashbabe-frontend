@@ -13,6 +13,7 @@ const SelectDateTime = ({ onNext, styles }) => {
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 1. Fetch the main booking settings once on mount
   useEffect(() => {
     const fetchSettings = async () => {
       setLoading(true);
@@ -23,42 +24,22 @@ const SelectDateTime = ({ onNext, styles }) => {
     fetchSettings();
   }, []);
 
+  // 2. Fetch the booked slots whenever the selectedDate changes
   useEffect(() => {
     const fetchBookedSlots = async () => {
       const booked = await getBookedSlotsForDate(selectedDate);
       setBookedSlots(booked);
-      setSelectedTime(null);
+      setSelectedTime(null); // Reset time selection when date changes
     };
     fetchBookedSlots();
   }, [selectedDate]);
 
-  // --- THE FIX IS HERE ---
   const handleNext = () => {
     if (selectedDate && selectedTime) {
       const [hours, minutes] = selectedTime.split(":");
-
-      // 1. Get the Year, Month, Day from the selected date picker
-      const year = selectedDate.getFullYear();
-      const month = selectedDate.getMonth();
-      const day = selectedDate.getDate();
-
-      // 2. Nigeria is UTC+1.
-      // To save the correct time in the DB (which expects UTC),
-      // we must SUBTRACT 1 hour from the selected time.
-      // Example: User picks 09:00. We want DB to save 08:00 UTC.
-      // 9 - 1 = 8.
-      const NIGERIA_OFFSET = 1;
-      const utcHour = parseInt(hours) - NIGERIA_OFFSET;
-
-      // 3. Create a UTC Date object
-      // We use Date.UTC to explicitly set the components
-      const utcDate = new Date(
-        Date.UTC(year, month, day, utcHour, parseInt(minutes), 0)
-      );
-
-      // 4. Pass this corrected UTC date to the next step
-      // When .toISOString() is called later, it will be the correct UTC time.
-      onNext({ dateTime: utcDate });
+      const dateTime = new Date(selectedDate);
+      dateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      onNext({ dateTime });
     } else {
       alert("Please select both a date and an available time.");
     }
@@ -71,21 +52,20 @@ const SelectDateTime = ({ onNext, styles }) => {
     const { StartTimeHour, EndTimeHour, SlotIntervalMinutes } = bookingSettings;
     const slots = [];
 
-    // Simple number manipulation to generate strings "09:00", "09:30"
-    // We don't use Date objects here to avoid timezone confusion during generation
-    let currentHour = StartTimeHour;
-    let currentMinute = 0;
+    // Create a date object to manipulate time
+    let currentTime = new Date();
+    currentTime.setHours(StartTimeHour, 0, 0, 0);
 
-    while (currentHour < EndTimeHour) {
-      const hStr = currentHour.toString().padStart(2, "0");
-      const mStr = currentMinute.toString().padStart(2, "0");
-      slots.push(`${hStr}:${mStr}`);
+    const endTime = new Date();
+    endTime.setHours(EndTimeHour, 0, 0, 0);
 
-      currentMinute += SlotIntervalMinutes;
-      if (currentMinute >= 60) {
-        currentHour += Math.floor(currentMinute / 60);
-        currentMinute = currentMinute % 60;
-      }
+    while (currentTime < endTime) {
+      const hours = currentTime.getHours().toString().padStart(2, "0");
+      const minutes = currentTime.getMinutes().toString().padStart(2, "0");
+      slots.push(`${hours}:${minutes}`);
+
+      // Increment time by the interval
+      currentTime.setMinutes(currentTime.getMinutes() + SlotIntervalMinutes);
     }
 
     return slots;
@@ -95,23 +75,18 @@ const SelectDateTime = ({ onNext, styles }) => {
   const filterSlotsByBookingWindow = (slots) => {
     if (!bookingSettings?.BookingWindowHours) return slots;
 
-    // Get Current Time in Nigeria (UTC+1) to make calculation fair
     const now = new Date();
-    const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
-    const nigeriaNow = new Date(utcNow + 3600000 * 1); // Add 1 hour for Nigeria
-
     const minimumBookingTime = new Date(
-      nigeriaNow.getTime() + bookingSettings.BookingWindowHours * 60 * 60 * 1000
+      now.getTime() + bookingSettings.BookingWindowHours * 60 * 60 * 1000
     );
 
     return slots.filter((slot) => {
+      // Create a Date object for this slot
       const [hours, minutes] = slot.split(":");
-
-      // Compare against the selected date
       const slotDateTime = new Date(selectedDate);
       slotDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
-      // Simple comparison
+      // Only include slots that are after the minimum booking window
       return slotDateTime >= minimumBookingTime;
     });
   };
@@ -124,15 +99,18 @@ const SelectDateTime = ({ onNext, styles }) => {
     );
   }
 
+  // Generate all potential time slots
   const allTimeSlots = generateTimeSlots();
 
   // Filter out booked slots
-  // Assuming getBookedSlotsForDate returns strings like "09:00" representing Nigeria time
   const unbookedSlots = allTimeSlots.filter(
     (slot) => !bookedSlots.includes(slot)
   );
 
+  // Filter out slots within the booking window (too soon to book)
   const availableTimeSlots = filterSlotsByBookingWindow(unbookedSlots);
+
+  // Calculate minimum date (today)
   const minDate = new Date();
 
   return (
