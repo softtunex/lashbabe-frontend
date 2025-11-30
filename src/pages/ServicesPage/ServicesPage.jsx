@@ -14,13 +14,19 @@ const ServicesPage = () => {
       try {
         const servicesRes = await getServices();
 
-        // SORTING: Main services first, Add-Ons last
+        // UPDATED SORTING LOGIC:
+        // 1. Add-Ons always go to the bottom.
+        // 2. Within each group (Main Services OR Add-Ons), sort by ID ascending.
         const sortedServices = servicesRes.sort((a, b) => {
-          // If a is AddOn and b is not, a goes last (return 1)
-          // If a is not AddOn and b is, a goes first (return -1)
+          // --- Primary Sort: IsAddOn ---
+          // If 'a' is AddOn and 'b' is NOT, 'a' goes last (return 1)
           if (a.IsAddOn && !b.IsAddOn) return 1;
+          // If 'a' is NOT AddOn and 'b' IS, 'a' goes first (return -1)
           if (!a.IsAddOn && b.IsAddOn) return -1;
-          return 0; // Keep original order if both are same type
+
+          // --- Secondary Sort: By ID ---
+          // If both are Main Services OR both are AddOns, sort by ID
+          return a.id - b.id;
         });
 
         setServices(sortedServices);
