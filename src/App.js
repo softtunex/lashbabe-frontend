@@ -14,6 +14,7 @@ import CartPage from "./pages/CartPage/CartPage"; // New cart page
 import AcademyPage from "./pages/AcademyPage/AcademyPage";
 import AboutPage from "./pages/AboutPage/AboutPage";
 import ContactPage from "./pages/ContactPage/ContactPage";
+import PolicyPage from "./pages/PolicyPage/PolicyPage";
 
 const promoIconStyle = {
   position: "fixed",
@@ -71,6 +72,7 @@ function App() {
             <Route path="/booking/:serviceId" element={<BookingPage />} />{" "}
             {/* Single service booking */}
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/policy" element={<PolicyPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>

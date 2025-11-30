@@ -50,6 +50,7 @@ const Header = () => {
           <Link to="/academy">Academy</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
+          <Link to="/policy">Policy</Link>
           <CartIcon /> {/* Cart icon for desktop */}
         </nav>
 
@@ -92,6 +93,12 @@ const Header = () => {
             onClick={() => handleMobileLinkClick("/contact")}
           >
             Contact
+          </div>
+          <div
+            className={styles.mobileLink}
+            onClick={() => handleMobileLinkClick("/policy")}
+          >
+            Policy
           </div>
         </nav>
       </header>

@@ -1,0 +1,151 @@
+/* src/pages/PolicyPage/PolicyPage.module.css */
+
+.pageContainer {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background-color: #f9f9f9; /* Light grey background for the page */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.navigation {
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 1.5rem;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: #1a1a1a;
+}
+
+/* --- Card Styling (Matches Modal) --- */
+.card {
+  background-color: white;
+  width: 100%;
+  max-width: 800px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Header --- */
+.header {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+}
+
+.shieldIcon {
+  font-size: 2rem;
+  color: #1a1a1a;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  font-family: serif; /* Matching your modal font */
+  color: #1a1a1a;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* --- Content Area --- */
+.content {
+  padding: 2.5rem 2rem;
+  color: #444;
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+/* Strapi Blocks Styling */
+.content h3,
+.content h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.content p {
+  margin-bottom: 1rem;
+}
+
+.content ul,
+.content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.content li {
+  margin-bottom: 0.5rem;
+}
+
+.content strong {
+  font-weight: 700;
+  color: #000;
+}
+
+/* --- Footer --- */
+.footer {
+  padding: 1.5rem;
+  background-color: #fcfcfc;
+  border-top: 1px solid #eee;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.footer a {
+  color: #1a1a1a;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.emptyState {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  .header {
+    padding: 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .content {
+    padding: 1.5rem;
+  }
+}
