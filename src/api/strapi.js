@@ -233,3 +233,18 @@ export const getBookingPolicy = async () => {
     return null;
   }
 };
+
+/**
+ * Updates an appointment status (e.g. from Pending to Confirmed)
+ */
+export const updateAppointmentStatus = async (documentId, status) => {
+  try {
+    const response = await API.put(`/api/appointments/${documentId}`, {
+      data: { BookingStatus: status },
+    });
+    return response.data?.data;
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    return null;
+  }
+};
