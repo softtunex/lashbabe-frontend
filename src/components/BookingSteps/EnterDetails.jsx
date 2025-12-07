@@ -1,12 +1,10 @@
 // src/components/BookingSteps/EnterDetails.jsx
-
 import React, { useState, useEffect } from "react";
-import { usePaystackPayment } from "react-paystack"; // Using the hook for better control
+import { PaystackButton } from "react-paystack";
 import {
   createAppointment,
   createPayment,
   getAvailableStaff,
-  updateAppointmentStatus, // Make sure this exists in your API file
 } from "../../api/strapi";
 import PolicyModal from "../PolicyModal/PolicyModal";
 
@@ -18,7 +16,6 @@ const EnterDetails = ({
   styles,
   bookingPolicy,
 }) => {
-  // --- STATE MANAGEMENT ---
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -29,12 +26,6 @@ const EnterDetails = ({
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  // Processing state to prevent double clicks
-  const [isProcessing, setIsProcessing] = useState(false);
-  // Store the Appointment ID after we create it as "Pending"
-  const [tempAppointmentId, setTempAppointmentId] = useState(null);
-
-  // --- INITIAL LOAD ---
   useEffect(() => {
     const fetchStaff = async () => {
       const staff = await getAvailableStaff();
@@ -49,7 +40,6 @@ const EnterDetails = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- CALCULATIONS ---
   // SORT SERVICES: Main first, Add-Ons last
   const sortedServices = [...services].sort((a, b) => {
     if (a.IsAddOn && !b.IsAddOn) return 1;
@@ -57,139 +47,72 @@ const EnterDetails = ({
     return 0;
   });
 
-  const totalDeposit = services.reduce((sum, s) => sum + (s.Deposit || 0), 0);
+  // --- Calculations ---
+  const totalDeposit = services.reduce((sum, s) => sum + s.Deposit, 0);
   const totalPrice = services.reduce(
     (sum, s) => sum + (s.OnSalesPrice || s.Price || 0),
     0
   );
-  // const totalDuration = services.reduce((sum, s) => sum + (s.Duration || 0), 0);
+  const totalDuration = services.reduce((sum, s) => sum + (s.Duration || 0), 0);
+  const depositAmount = totalDeposit * 100; // Paystack takes kobo
 
-  // Check if form is valid
+  // --- Logic Configuration ---
+  // If ShowBeforePayment is null/undefined, default to TRUE. Only skip if explicitly false.
+  const shouldShowPolicyBefore = bookingPolicy?.ShowBeforePayment ?? true;
   const isFormValid = formData.fullName && formData.email && formData.phone;
 
-  // --- PAYSTACK CONFIGURATION ---
-  const paystackConfig = {
-    reference: new Date().getTime().toString(),
-    email: formData.email,
-    amount: Math.ceil(totalDeposit * 100), // Convert to Kobo (ensure integer)
-    publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
-    metadata: {
-      name: formData.fullName,
-      phone: formData.phone,
-      custom_fields: [
-        {
-          display_name: "Appointment ID",
-          variable_name: "appointment_id",
-          value: tempAppointmentId, // Will be null initially, but that's okay for config
-        },
-      ],
-    },
-  };
+  // --- Paystack Handlers ---
+  const handleSuccess = async (transaction) => {
+    const reference = transaction.reference;
 
-  // Initialize the Hook
-  const initializePayment = usePaystackPayment(paystackConfig);
+    // 1. Record Payment
+    await createPayment({
+      Reference: reference,
+      Amount: totalDeposit,
+      ClientEmail: formData.email,
+      PaymentStatus: "Success",
+    });
 
-  // --- HANDLERS ---
+    // 2. Create Appointment
+    const appointmentData = {
+      ClientName: formData.fullName,
+      ClientEmail: formData.email,
+      ClientPhone: formData.phone,
+      AppointmentDateTime: bookingDetails.dateTime.toISOString(),
+      BookingStatus: "Confirmed",
+      TotalAmount: totalPrice,
+      booked_services: services.map((s) => s.documentId),
+      SelectedStaff: formData.selectedStaff || null,
+    };
 
-  // 1. Success Handler (Runs after Payment)
-  const onPaystackSuccess = async (reference) => {
-    try {
-      // A. Record the Payment
-      await createPayment({
-        Reference: reference.reference,
-        Amount: totalDeposit,
-        ClientEmail: formData.email,
-        PaymentStatus: "Success",
-        Appointment: tempAppointmentId, // Link payment to the appointment
-      });
+    const newAppointment = await createAppointment(appointmentData);
 
-      // B. Update Appointment Status: Pending -> Confirmed
-      // This is what triggers the Backend Email logic!
-      const updated = await updateAppointmentStatus(
-        tempAppointmentId,
-        "Confirmed"
-      );
-
-      if (updated) {
-        setIsProcessing(false);
-        // Move to Confirmation Screen
-        onNext({ ...formData, paymentReference: reference.reference });
-      } else {
-        throw new Error("Failed to update status");
-      }
-    } catch (error) {
-      console.error("Finalization error:", error);
-      alert(
-        "Payment successful, but the system timed out confirming the booking. Please contact support with Ref: " +
-          reference.reference
-      );
-      setIsProcessing(false);
-    }
-  };
-
-  // 2. Close Handler
-  const onPaystackClose = () => {
-    setIsProcessing(false);
-    alert("Payment cancelled. Your slot has not been reserved.");
-  };
-
-  // 3. Main Process: Create Pending Appt -> Open Paystack
-  const handleBookingProcess = async () => {
-    setIsProcessing(true);
-
-    try {
-      // Step A: Create Appointment as "Pending"
-      const appointmentData = {
-        ClientName: formData.fullName,
-        ClientEmail: formData.email,
-        ClientPhone: formData.phone,
-        AppointmentDateTime: bookingDetails.dateTime.toISOString(),
-        BookingStatus: "Pending", // <--- KEY CHANGE: Start as Pending
-        TotalAmount: totalPrice,
-        booked_services: services.map((s) => s.documentId),
-        SelectedStaff: formData.selectedStaff || null,
-      };
-
-      const newAppointment = await createAppointment(appointmentData);
-
-      if (!newAppointment || newAppointment.error) {
-        throw new Error(newAppointment?.error || "Creation failed");
-      }
-
-      // Save ID so we can update it later
-      setTempAppointmentId(newAppointment.documentId);
-
-      // Step B: Trigger Payment Window
-      // We pass the config object implicitly via the hook,
-      // but we update the onSuccess/onClose callbacks here.
-      initializePayment(onPaystackSuccess, onPaystackClose);
-    } catch (err) {
-      console.error("Initialization failed:", err);
-      alert(
-        "Could not initialize booking. Please check your internet connection."
-      );
-      setIsProcessing(false);
-    }
-  };
-
-  // 4. Policy Modal Logic
-  const handleProceedClick = () => {
-    // If policy check is required before payment (default behavior)
-    if (bookingPolicy?.ShowBeforePayment !== false) {
-      setShowModal(true);
+    if (newAppointment && !newAppointment.error) {
+      onNext({ ...formData, paymentReference: reference });
     } else {
-      // If policy is shown AFTER payment (rare config), go straight to process
-      handleBookingProcess();
+      alert(
+        "Payment successful but booking failed. Please screenshot this and contact support."
+      );
     }
+  };
+
+  const paystackProps = {
+    email: formData.email,
+    amount: depositAmount,
+    metadata: { name: formData.fullName, phone: formData.phone },
+    publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
+    onSuccess: handleSuccess,
+    onClose: () => alert("Payment window closed"),
   };
 
   return (
     <div className={styles.stepContainer}>
       <h2>Enter Your Details</h2>
 
-      {/* --- BOOKING SUMMARY --- */}
       <div className={styles.bookingSummary}>
         <h3>Booking Summary</h3>
+
+        {/* Use sortedServices here */}
         {sortedServices.map((service, index) => (
           <div key={service.documentId || index} className={styles.serviceItem}>
             <p>
@@ -204,6 +127,8 @@ const EnterDetails = ({
           </div>
         ))}
         <hr />
+
+        {/* Appointment Details */}
         <p>
           <strong>Date:</strong> {bookingDetails.dateTime?.toDateString()}
         </p>
@@ -215,9 +140,13 @@ const EnterDetails = ({
           })}
         </p>
         <p>
+          <strong>Total Duration:</strong> {totalDuration} minutes
+        </p>
+        <p>
           <strong>Total Price:</strong> ₦{totalPrice.toLocaleString()}
         </p>
 
+        {/* Deposit Highlight */}
         <div
           style={{
             marginTop: "1rem",
@@ -228,12 +157,13 @@ const EnterDetails = ({
           }}
         >
           <p style={{ margin: 0, fontSize: "1.1rem" }}>
-            <strong>Deposit Required:</strong> ₦{totalDeposit.toLocaleString()}
+            <strong>Total Deposit Required:</strong> ₦
+            {totalDeposit.toLocaleString()}
           </p>
         </div>
       </div>
+      {/* --- END SUMMARY --- */}
 
-      {/* --- FORM --- */}
       <form className={styles.detailsForm} onSubmit={(e) => e.preventDefault()}>
         <input
           name="fullName"
@@ -274,27 +204,34 @@ const EnterDetails = ({
         )}
 
         <div className={styles.buttonGroup}>
-          <button
-            className={styles.backButton}
-            onClick={onBack}
-            type="button"
-            disabled={isProcessing}
-          >
+          <button className={styles.backButton} onClick={onBack} type="button">
             BACK
           </button>
 
-          <button
-            className={styles.nextButton}
-            onClick={handleProceedClick}
-            disabled={!isFormValid || isProcessing}
-            type="button"
-          >
-            {isProcessing ? "PROCESSING..." : "PROCEED TO PAYMENT"}
-          </button>
+          {/* Conditional Button Rendering */}
+          {shouldShowPolicyBefore ? (
+            // Policy BEFORE Payment -> Open Modal
+            <button
+              className={styles.nextButton}
+              onClick={() => setShowModal(true)}
+              disabled={!isFormValid}
+              type="button"
+            >
+              REVIEW POLICY & DEPOSIT
+            </button>
+          ) : (
+            // Policy AFTER Payment -> Direct Paystack
+            <PaystackButton
+              {...paystackProps}
+              text="MAKE DEPOSIT"
+              className={styles.nextButton}
+              disabled={!isFormValid}
+            />
+          )}
         </div>
       </form>
 
-      {/* --- POLICY MODAL --- */}
+      {/* Policy Modal */}
       {showModal && (
         <PolicyModal
           policyContent={bookingPolicy?.PolicyContent}
@@ -319,26 +256,25 @@ const EnterDetails = ({
             CANCEL
           </button>
 
-          <button
-            onClick={() => {
-              setShowModal(false);
-              handleBookingProcess(); // Triggers the Pending -> Pay logic
-            }}
-            style={{
-              flex: 1,
-              padding: "1rem",
-              backgroundColor: "#1a1a1a",
-              color: "white",
-              border: "2px solid #1a1a1a",
-              borderRadius: "6px",
-              fontWeight: "700",
-              cursor: "pointer",
-              textTransform: "uppercase",
-              fontSize: "0.9rem",
-            }}
-          >
-            I AGREE & PAY
-          </button>
+          <div style={{ flex: 1 }}>
+            <PaystackButton
+              {...paystackProps}
+              text="I AGREE & DEPOSIT"
+              className="paystack-modal-btn"
+              style={{
+                width: "100%",
+                padding: "1rem",
+                backgroundColor: "#1a1a1a",
+                color: "white",
+                border: "2px solid #1a1a1a",
+                borderRadius: "6px",
+                fontWeight: "700",
+                cursor: "pointer",
+                textTransform: "uppercase",
+                fontSize: "0.9rem",
+              }}
+            />
+          </div>
         </PolicyModal>
       )}
     </div>
