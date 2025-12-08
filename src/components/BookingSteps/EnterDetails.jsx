@@ -65,7 +65,7 @@ const EnterDetails = ({
     const reference = transaction.reference;
 
     try {
-      // 1. Record Payment
+      // 1. Record the Payment
       await createPayment({
         Reference: reference,
         Amount: totalDeposit,
