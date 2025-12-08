@@ -1,11 +1,10 @@
 // src/components/BookingSteps/EnterDetails.jsx
 import React, { useState, useEffect } from "react";
-import { usePaystackPayment } from "react-paystack";
+import { PaystackButton } from "react-paystack";
 import {
   createAppointment,
   createPayment,
   getAvailableStaff,
-  updateAppointmentStatus,
 } from "../../api/strapi";
 import PolicyModal from "../PolicyModal/PolicyModal";
 
@@ -17,7 +16,6 @@ const EnterDetails = ({
   styles,
   bookingPolicy,
 }) => {
-  // --- STATE ---
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -27,13 +25,8 @@ const EnterDetails = ({
   const [availableStaff, setAvailableStaff] = useState([]);
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
-  // Flow Control
   const [isProcessing, setIsProcessing] = useState(false);
-  const [appointmentId, setAppointmentId] = useState(null); // Strapi ID
-  const [triggerPayment, setTriggerPayment] = useState(false); // The Auto-Launcher
 
-  // --- 1. FETCH STAFF ---
   useEffect(() => {
     const fetchStaff = async () => {
       const staff = await getAvailableStaff();
@@ -48,7 +41,7 @@ const EnterDetails = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- CALCULATIONS ---
+  // SORT SERVICES
   const sortedServices = [...services].sort((a, b) => {
     if (a.IsAddOn && !b.IsAddOn) return 1;
     if (!a.IsAddOn && b.IsAddOn) return -1;
@@ -60,79 +53,33 @@ const EnterDetails = ({
     (sum, s) => sum + (s.OnSalesPrice || s.Price || 0),
     0
   );
+  const totalDuration = services.reduce((sum, s) => sum + (s.Duration || 0), 0);
+  const depositAmount = totalDeposit * 100; // Paystack takes kobo
+
+  const shouldShowPolicyBefore = bookingPolicy?.ShowBeforePayment ?? true;
   const isFormValid = formData.fullName && formData.email && formData.phone;
 
-  // --- PAYSTACK HOOK CONFIG ---
-  // This config automatically updates whenever appointmentId changes
-  const paystackConfig = {
-    reference: new Date().getTime().toString(),
-    email: formData.email,
-    amount: Math.ceil(totalDeposit * 100), // Kobo
-    publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
-    metadata: {
-      name: formData.fullName,
-      phone: formData.phone,
-      // CRITICAL: This sends the ID to the Webhook
-      appointment_id: appointmentId,
-    },
-  };
+  // --- Paystack Handlers ---
+  const handleSuccess = async (transaction) => {
+    setIsProcessing(true); // Lock the screen
+    const reference = transaction.reference;
 
-  // Initialize Hook
-  const initializePayment = usePaystackPayment(paystackConfig);
-
-  // --- PAYMENT HANDLERS ---
-  const onPaystackSuccess = async (reference) => {
     try {
-      // 1. Record Payment (Client side)
+      // 1. Record Payment
       await createPayment({
-        Reference: reference.reference,
+        Reference: reference,
         Amount: totalDeposit,
         ClientEmail: formData.email,
         PaymentStatus: "Success",
-        Appointment: appointmentId,
       });
 
-      // 2. Confirm Appointment (Client side - Speed)
-      // Webhook acts as the safety net if this fails
-      await updateAppointmentStatus(appointmentId, "Confirmed");
-
-      setIsProcessing(false);
-      onNext({ ...formData, paymentReference: reference.reference });
-    } catch (error) {
-      console.error("Local confirmation failed, relying on webhook:", error);
-      // Proceed anyway because payment was successful
-      setIsProcessing(false);
-      onNext({ ...formData, paymentReference: reference.reference });
-    }
-  };
-
-  const onPaystackClose = () => {
-    setIsProcessing(false);
-    setTriggerPayment(false);
-    alert("Payment window closed. You can retry the payment.");
-  };
-
-  // --- THE LOGIC: 1-CLICK FLOW ---
-
-  const startBookingFlow = async () => {
-    setIsProcessing(true);
-
-    try {
-      // SCENARIO A: User clicked, cancelled, then clicked again.
-      // We already have an ID. Don't create a duplicate. Just open Paystack.
-      if (appointmentId) {
-        setTriggerPayment(true);
-        return;
-      }
-
-      // SCENARIO B: Fresh Booking.
-      // 1. Create Pending Appointment
+      // 2. Create Appointment
       const appointmentData = {
         ClientName: formData.fullName,
         ClientEmail: formData.email,
         ClientPhone: formData.phone,
         AppointmentDateTime: bookingDetails.dateTime.toISOString(),
-        BookingStatus: "Pending", // Blocks slot
+        BookingStatus: "Confirmed",
         TotalAmount: totalPrice,
         booked_services: services.map((s) => s.documentId),
         SelectedStaff: formData.selectedStaff || null,
@@ -140,47 +87,49 @@ const EnterDetails = ({
 
       const newAppointment = await createAppointment(appointmentData);
 
-      if (!newAppointment || newAppointment.error) {
-        throw new Error(newAppointment?.error || "Creation failed");
+      if (newAppointment && !newAppointment.error) {
+        onNext({ ...formData, paymentReference: reference });
+      } else {
+        alert("Payment successful! Completing booking...");
+        // Even if this fails, the Webhook will catch it now.
+        onNext({ ...formData, paymentReference: reference });
       }
-
-      // 2. Save ID. This will cause a re-render.
-      setAppointmentId(newAppointment.documentId);
-
-      // 3. Set Trigger. The useEffect below will catch this and open Paystack.
-      setTriggerPayment(true);
-    } catch (err) {
-      console.error(err);
-      alert("Could not start booking. Please check connection.");
+    } catch (error) {
+      console.error("Booking Error:", error);
+      // Webhook will handle recovery
+      onNext({ ...formData, paymentReference: reference });
+    } finally {
       setIsProcessing(false);
     }
   };
 
-  // --- THE TRIGGER EFFECT ---
-  // This watches for when we are ready to pay and the ID exists
-  useEffect(() => {
-    if (triggerPayment && appointmentId) {
-      // Open Paystack Popup automatically
-      initializePayment(onPaystackSuccess, onPaystackClose);
-
-      // Reset trigger so it doesn't loop
-      setTriggerPayment(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggerPayment, appointmentId]);
-
-  // --- UI HANDLERS ---
-  const handleProceedClick = () => {
-    if (bookingPolicy?.ShowBeforePayment !== false) {
-      setShowModal(true);
-    } else {
-      startBookingFlow();
-    }
+  const paystackProps = {
+    email: formData.email,
+    amount: depositAmount,
+    publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
+    // --- CRITICAL UPDATE: PASSING RECOVERY DATA ---
+    metadata: {
+      name: formData.fullName,
+      phone: formData.phone,
+      // We pass the raw data so the backend can create the appointment if the frontend fails
+      booking_recovery: {
+        dateTime: bookingDetails.dateTime.toISOString(),
+        serviceIds: services.map((s) => s.documentId),
+        staffId: formData.selectedStaff || null,
+        totalPrice: totalPrice,
+        clientName: formData.fullName,
+        clientPhone: formData.phone,
+      },
+    },
+    // ----------------------------------------------
+    onSuccess: handleSuccess,
+    onClose: () => alert("Payment window closed"),
   };
 
   return (
     <div className={styles.stepContainer}>
       <h2>Enter Your Details</h2>
+
       <div className={styles.bookingSummary}>
         <h3>Booking Summary</h3>
         {sortedServices.map((service, index) => (
@@ -193,12 +142,27 @@ const EnterDetails = ({
                 <span className={styles.addOnBadge}>Add-On</span>
               )}
             </p>
+            <p className={styles.serviceDuration}>{service.Duration} minutes</p>
           </div>
         ))}
         <hr />
         <p>
+          <strong>Date:</strong> {bookingDetails.dateTime?.toDateString()}
+        </p>
+        <p>
+          <strong>Time:</strong>{" "}
+          {bookingDetails.dateTime?.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </p>
+        <p>
+          <strong>Total Duration:</strong> {totalDuration} minutes
+        </p>
+        <p>
           <strong>Total Price:</strong> ₦{totalPrice.toLocaleString()}
         </p>
+
         <div
           style={{
             marginTop: "1rem",
@@ -209,7 +173,8 @@ const EnterDetails = ({
           }}
         >
           <p style={{ margin: 0, fontSize: "1.1rem" }}>
-            <strong>Deposit Required:</strong> ₦{totalDeposit.toLocaleString()}
+            <strong>Total Deposit Required:</strong> ₦
+            {totalDeposit.toLocaleString()}
           </p>
         </div>
       </div>
@@ -267,14 +232,23 @@ const EnterDetails = ({
             BACK
           </button>
 
-          <button
-            className={styles.nextButton}
-            onClick={handleProceedClick}
-            disabled={!isFormValid || isProcessing}
-            type="button"
-          >
-            {isProcessing ? "PROCESSING..." : "PROCEED TO PAYMENT"}
-          </button>
+          {shouldShowPolicyBefore ? (
+            <button
+              className={styles.nextButton}
+              onClick={() => setShowModal(true)}
+              disabled={!isFormValid || isProcessing}
+              type="button"
+            >
+              {isProcessing ? "PROCESSING..." : "REVIEW POLICY & DEPOSIT"}
+            </button>
+          ) : (
+            <PaystackButton
+              {...paystackProps}
+              text={isProcessing ? "PROCESSING..." : "MAKE DEPOSIT"}
+              className={styles.nextButton}
+              disabled={!isFormValid || isProcessing}
+            />
+          )}
         </div>
       </form>
 
@@ -299,23 +273,23 @@ const EnterDetails = ({
           >
             CANCEL
           </button>
-          <button
-            onClick={() => {
-              setShowModal(false);
-              startBookingFlow();
-            }}
-            style={{
-              flex: 1,
-              padding: "1rem",
-              backgroundColor: "#1a1a1a",
-              color: "white",
-              borderRadius: "6px",
-              fontWeight: "700",
-              cursor: "pointer",
-            }}
-          >
-            I AGREE & PAY
-          </button>
+          <div style={{ flex: 1 }}>
+            <PaystackButton
+              {...paystackProps}
+              text="I AGREE & DEPOSIT"
+              className="paystack-modal-btn"
+              style={{
+                width: "100%",
+                padding: "1rem",
+                backgroundColor: "#1a1a1a",
+                color: "white",
+                border: "2px solid #1a1a1a",
+                borderRadius: "6px",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            />
+          </div>
         </PolicyModal>
       )}
     </div>
