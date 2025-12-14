@@ -564,3 +564,22 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* src/pages/BookingPage/BookingPage.module.css */
+
+/* Add this new class */
+.timeSlotDisabled {
+  background-color: #f0f0f0 !important;
+  color: #ccc !important;
+  border-color: #eee !important;
+  cursor: not-allowed !important;
+  text-decoration: line-through; /* Optional: adds strikethrough */
+  opacity: 0.6;
+}
+
+/* Ensure hover doesn't change it */
+.timeSlotDisabled:hover {
+  transform: none !important;
+  background-color: #f0f0f0 !important;
+  border-color: #eee !important;
+  box-shadow: none !important;
+}

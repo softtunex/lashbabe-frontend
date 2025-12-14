@@ -8,12 +8,10 @@ const SelectDateTime = ({ onNext, styles }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(null);
 
-  // State for our dynamic data
   const [bookingSettings, setBookingSettings] = useState(null);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch the main booking settings once on mount
   useEffect(() => {
     const fetchSettings = async () => {
       setLoading(true);
@@ -24,12 +22,11 @@ const SelectDateTime = ({ onNext, styles }) => {
     fetchSettings();
   }, []);
 
-  // 2. Fetch the booked slots whenever the selectedDate changes
   useEffect(() => {
     const fetchBookedSlots = async () => {
       const booked = await getBookedSlotsForDate(selectedDate);
       setBookedSlots(booked);
-      setSelectedTime(null); // Reset time selection when date changes
+      setSelectedTime(null);
     };
     fetchBookedSlots();
   }, [selectedDate]);
@@ -45,17 +42,12 @@ const SelectDateTime = ({ onNext, styles }) => {
     }
   };
 
-  // Generate time slots based on booking settings
   const generateTimeSlots = () => {
     if (!bookingSettings) return [];
-
     const { StartTimeHour, EndTimeHour, SlotIntervalMinutes } = bookingSettings;
     const slots = [];
-
-    // Create a date object to manipulate time
     let currentTime = new Date();
     currentTime.setHours(StartTimeHour, 0, 0, 0);
-
     const endTime = new Date();
     endTime.setHours(EndTimeHour, 0, 0, 0);
 
@@ -63,32 +55,28 @@ const SelectDateTime = ({ onNext, styles }) => {
       const hours = currentTime.getHours().toString().padStart(2, "0");
       const minutes = currentTime.getMinutes().toString().padStart(2, "0");
       slots.push(`${hours}:${minutes}`);
-
-      // Increment time by the interval
       currentTime.setMinutes(currentTime.getMinutes() + SlotIntervalMinutes);
     }
-
     return slots;
   };
 
-  // Filter out slots that are within the booking window (minimum advance notice)
-  const filterSlotsByBookingWindow = (slots) => {
-    if (!bookingSettings?.BookingWindowHours) return slots;
+  // Helper to check if a specific slot is too soon (Booking Window)
+  const isSlotTooSoon = (slot) => {
+    if (!bookingSettings?.BookingWindowHours) return false;
 
     const now = new Date();
-    const minimumBookingTime = new Date(
+    // Calculate the earliest possible booking time allowed
+    const minimumTime = new Date(
       now.getTime() + bookingSettings.BookingWindowHours * 60 * 60 * 1000
     );
 
-    return slots.filter((slot) => {
-      // Create a Date object for this slot
-      const [hours, minutes] = slot.split(":");
-      const slotDateTime = new Date(selectedDate);
-      slotDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    // Create a date object for the slot we are checking
+    const [hours, minutes] = slot.split(":");
+    const slotTime = new Date(selectedDate);
+    slotTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
-      // Only include slots that are after the minimum booking window
-      return slotDateTime >= minimumBookingTime;
-    });
+    // If the slot is earlier than the minimum time, it is "too soon"
+    return slotTime < minimumTime;
   };
 
   if (loading) {
@@ -99,19 +87,7 @@ const SelectDateTime = ({ onNext, styles }) => {
     );
   }
 
-  // Generate all potential time slots
   const allTimeSlots = generateTimeSlots();
-
-  // Filter out booked slots
-  const unbookedSlots = allTimeSlots.filter(
-    (slot) => !bookedSlots.includes(slot)
-  );
-
-  // Filter out slots within the booking window (too soon to book)
-  const availableTimeSlots = filterSlotsByBookingWindow(unbookedSlots);
-
-  // Calculate minimum date (today)
-  const minDate = new Date();
 
   return (
     <div className={styles.stepContainer}>
@@ -119,8 +95,8 @@ const SelectDateTime = ({ onNext, styles }) => {
 
       {bookingSettings?.BookingWindowHours && (
         <p className={styles.bookingNotice}>
-          Appointments must be booked at least{" "}
-          {bookingSettings.BookingWindowHours} hours in advance
+          Note: Bookings must be made at least{" "}
+          {bookingSettings.BookingWindowHours} hours in advance.
         </p>
       )}
 
@@ -130,7 +106,7 @@ const SelectDateTime = ({ onNext, styles }) => {
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
             inline
-            minDate={minDate}
+            minDate={new Date()}
             dateFormat="MMMM d, yyyy"
             calendarStartDay={0}
           />
@@ -138,25 +114,48 @@ const SelectDateTime = ({ onNext, styles }) => {
         <div className={styles.timeSlotsSection}>
           <h3 className={styles.timeSlotsTitle}>Available Time Slots</h3>
           <div className={styles.timeSlotsGrid}>
-            {availableTimeSlots.length > 0 ? (
-              availableTimeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  className={`${styles.timeSlot} ${selectedTime === slot ? styles.timeSlotSelected : ""}`}
-                  onClick={() => setSelectedTime(slot)}
-                  type="button"
-                >
-                  {slot}
-                </button>
-              ))
+            {allTimeSlots.length > 0 ? (
+              allTimeSlots.map((slot) => {
+                // 1. Check if booked
+                const isBooked = bookedSlots.includes(slot);
+                // 2. Check if too soon
+                const isTooSoon = isSlotTooSoon(slot);
+                // 3. Determine if disabled
+                const isDisabled = isBooked || isTooSoon;
+
+                return (
+                  <button
+                    key={slot}
+                    className={`
+                      ${styles.timeSlot} 
+                      ${selectedTime === slot ? styles.timeSlotSelected : ""} 
+                      ${isDisabled ? styles.timeSlotDisabled : ""}
+                    `}
+                    onClick={() => !isDisabled && setSelectedTime(slot)}
+                    type="button"
+                    disabled={isDisabled}
+                  >
+                    {slot}
+                  </button>
+                );
+              })
             ) : (
               <p className={styles.noSlotsMessage}>
-                {unbookedSlots.length === 0
-                  ? "No available slots for this day."
-                  : `All slots are within the ${bookingSettings.BookingWindowHours}-hour booking window. Please select a later date or time.`}
+                No time slots configured for today.
               </p>
             )}
           </div>
+          {/* Simple footer message if user is confused why slots are gray */}
+          <p
+            style={{
+              fontSize: "0.8rem",
+              color: "#999",
+              textAlign: "center",
+              marginTop: "10px",
+            }}
+          >
+            Disabled slots are already booked or unavailable.
+          </p>
         </div>
       </div>
       <button
