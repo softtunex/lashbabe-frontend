@@ -27,6 +27,10 @@ const EnterDetails = ({
   const [showModal, setShowModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // NEW: Store the created appointment ID
+  const [appointmentId, setAppointmentId] = useState(null);
+  const [showPaystackButton, setShowPaystackButton] = useState(false);
+
   useEffect(() => {
     const fetchStaff = async () => {
       const staff = await getAvailableStaff();
@@ -59,27 +63,21 @@ const EnterDetails = ({
   const shouldShowPolicyBefore = bookingPolicy?.ShowBeforePayment ?? true;
   const isFormValid = formData.fullName && formData.email && formData.phone;
 
-  // --- Paystack Handlers ---
-  const handleSuccess = async (transaction) => {
-    setIsProcessing(true); // Lock the screen
-    const reference = transaction.reference;
+  // NEW: Create appointment BEFORE payment (only once)
+  const handleCreateAppointment = async () => {
+    if (appointmentId) {
+      return appointmentId; // Already created
+    }
+
+    setIsProcessing(true);
 
     try {
-      // 1. Record the Payment
-      await createPayment({
-        Reference: reference,
-        Amount: totalDeposit,
-        ClientEmail: formData.email,
-        PaymentStatus: "Success",
-      });
-
-      // 2. Create Appointment
       const appointmentData = {
         ClientName: formData.fullName,
         ClientEmail: formData.email,
         ClientPhone: formData.phone,
         AppointmentDateTime: bookingDetails.dateTime.toISOString(),
-        BookingStatus: "Confirmed",
+        BookingStatus: "Pending", // Will be updated to "Confirmed" by webhook
         TotalAmount: totalPrice,
         booked_services: services.map((s) => s.documentId),
         SelectedStaff: formData.selectedStaff || null,
@@ -88,43 +86,98 @@ const EnterDetails = ({
       const newAppointment = await createAppointment(appointmentData);
 
       if (newAppointment && !newAppointment.error) {
-        onNext({ ...formData, paymentReference: reference });
+        setAppointmentId(newAppointment.documentId);
+        console.log("Appointment created:", newAppointment.documentId);
+        setIsProcessing(false);
+        return newAppointment.documentId;
       } else {
-        alert("Payment successful! Completing booking...");
-        // Even if this fails, the Webhook will catch it now.
-        onNext({ ...formData, paymentReference: reference });
+        console.error("Appointment creation failed:", newAppointment?.error);
+        alert("Failed to create appointment. Please try again.");
+        setIsProcessing(false);
+        return null;
       }
     } catch (error) {
-      console.error("Booking Error:", error);
-      // Webhook will handle recovery
+      console.error("Error creating appointment:", error);
+      alert("Something went wrong. Please try again.");
+      setIsProcessing(false);
+      return null;
+    }
+  };
+
+  // UPDATED: Simplified success handler
+  const handleSuccess = async (transaction) => {
+    setIsProcessing(true);
+    const reference = transaction.reference;
+
+    try {
+      // Record the payment
+      await createPayment({
+        Reference: reference,
+        Amount: totalDeposit,
+        ClientEmail: formData.email,
+        PaymentStatus: "Success",
+        Appointment: appointmentId,
+      });
+
+      console.log("Payment recorded successfully");
+      onNext({ ...formData, paymentReference: reference });
+    } catch (error) {
+      console.error("Payment record error:", error);
+      // Even if this fails, webhook should handle it
       onNext({ ...formData, paymentReference: reference });
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // UPDATED: Paystack props with appointment_id
   const paystackProps = {
     email: formData.email,
     amount: depositAmount,
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
-    // --- CRITICAL UPDATE: PASSING RECOVERY DATA ---
     metadata: {
       name: formData.fullName,
       phone: formData.phone,
-      // We pass the raw data so the backend can create the appointment if the frontend fails
-      booking_recovery: {
-        dateTime: bookingDetails.dateTime.toISOString(),
-        serviceIds: services.map((s) => s.documentId),
-        staffId: formData.selectedStaff || null,
-        totalPrice: totalPrice,
-        clientName: formData.fullName,
-        clientPhone: formData.phone,
-      },
+      appointment_id: appointmentId, // CRITICAL: This is what webhook needs!
     },
-    // ----------------------------------------------
     onSuccess: handleSuccess,
-    onClose: () => alert("Payment window closed"),
+    onClose: () => {
+      setIsProcessing(false);
+      console.log("Payment window closed");
+    },
   };
+
+  // Handler for button clicks (creates appointment then shows Paystack button)
+  const handlePaymentClick = async () => {
+    const id = await handleCreateAppointment();
+    if (id) {
+      // Appointment created successfully, now show the Paystack button which will auto-trigger
+      setShowPaystackButton(true);
+    }
+  };
+
+  // Handler for modal policy button
+  const handlePolicyClick = async () => {
+    const id = await handleCreateAppointment();
+    if (id) {
+      setShowModal(true);
+    }
+  };
+
+  // Auto-trigger Paystack when button becomes visible
+  useEffect(() => {
+    if (showPaystackButton && appointmentId) {
+      // Use a small delay to ensure button is rendered
+      const timer = setTimeout(() => {
+        const paystackBtn = document.querySelector(".paystack-auto-trigger");
+        if (paystackBtn) {
+          paystackBtn.click();
+          setShowPaystackButton(false); // Reset for next time
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showPaystackButton, appointmentId]);
 
   return (
     <div className={styles.stepContainer}>
@@ -190,6 +243,7 @@ const EnterDetails = ({
         />
         <input
           name="email"
+          type="email"
           placeholder="Email Address"
           value={formData.email}
           onChange={handleInputChange}
@@ -198,6 +252,7 @@ const EnterDetails = ({
         />
         <input
           name="phone"
+          type="tel"
           placeholder="Phone Number"
           value={formData.phone}
           onChange={handleInputChange}
@@ -235,19 +290,34 @@ const EnterDetails = ({
           {shouldShowPolicyBefore ? (
             <button
               className={styles.nextButton}
-              onClick={() => setShowModal(true)}
+              onClick={handlePolicyClick}
               disabled={!isFormValid || isProcessing}
               type="button"
             >
               {isProcessing ? "PROCESSING..." : "REVIEW POLICY & DEPOSIT"}
             </button>
           ) : (
-            <PaystackButton
-              {...paystackProps}
-              text={isProcessing ? "PROCESSING..." : "MAKE DEPOSIT"}
-              className={styles.nextButton}
-              disabled={!isFormValid || isProcessing}
-            />
+            <>
+              {showPaystackButton && appointmentId ? (
+                // Auto-triggered PaystackButton (hidden, just to trigger payment)
+                <div style={{ display: "none" }}>
+                  <PaystackButton
+                    {...paystackProps}
+                    text="MAKE DEPOSIT"
+                    className="paystack-auto-trigger"
+                  />
+                </div>
+              ) : null}
+              {/* Always show this button - it creates appointment and triggers Paystack */}
+              <button
+                className={styles.nextButton}
+                onClick={handlePaymentClick}
+                disabled={!isFormValid || isProcessing}
+                type="button"
+              >
+                {isProcessing ? "PROCESSING..." : "MAKE DEPOSIT"}
+              </button>
+            </>
           )}
         </div>
       </form>
@@ -256,10 +326,16 @@ const EnterDetails = ({
         <PolicyModal
           policyContent={bookingPolicy?.PolicyContent}
           title="Please Review Our Policy"
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setIsProcessing(false);
+          }}
         >
           <button
-            onClick={() => setShowModal(false)}
+            onClick={() => {
+              setShowModal(false);
+              setIsProcessing(false);
+            }}
             style={{
               flex: 1,
               padding: "1rem",
